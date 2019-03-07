@@ -4,20 +4,20 @@ function MessageHandler (win, sourceOrigin, adapter) {
         var functionName = e.data["function"];
         var functionArgs = e.data["arguments"];
         if (functionName && functionArgs && typeof this[functionName] === "function") {
-	        this[functionName].apply(this, functionArgs);
+            this[functionName].apply(this, functionArgs);
         }
     }.bind(this));
 
     this.setTitle = function (title) {
-    	document.title = title;
+        document.title = title;
     };
 
     this.setScore = function (score) {
-    	adapter.setScore(score);
+        adapter.setScore(score);
     };
 
     this.setLessonStatus = function (lessonStatus) {
-    	adapter.setLessonStatus(lessonStatus);
+        adapter.setLessonStatus(lessonStatus);
     };
 }
 

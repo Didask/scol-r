@@ -12,5 +12,8 @@
       "modules": false,
       "jsx": false
     }
+  },
+  "rules": {
+    "no-console": ["error", { "allow": ["error", "warn"] }]
   }
 }

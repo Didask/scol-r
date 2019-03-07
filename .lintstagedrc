@@ -1,5 +1,14 @@
 {
-  "index.html": ["size-limit --limit 1KB"],
-  "dist/scol-r.js": ["size-limit --limit 4KB"],
-  "src/**/*.{js}": ["eslint --fix","git add"]
+  "index.html": [
+    "size-limit --limit 1KB",
+    "git add"
+  ],
+  "dist/scol-r.js": [
+    "size-limit --limit 4KB",
+    "git add"
+  ],
+  "src/**/*.js": [
+    "eslint --fix",
+    "git add"
+  ]
 }

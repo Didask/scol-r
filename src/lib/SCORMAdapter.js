@@ -83,7 +83,7 @@ function SCORMAdapter(errorCallback) {
 
     this.LMSFinish = this.LMSTerminate;
 
-    this.LMSGetValue = function (name) {
+    this.LMSGetValue = function () {
         var value = this._callAPIFunction("GetValue", arguments);
         if (this.LMSGetLastError() === 0) {
             return value;
@@ -93,7 +93,7 @@ function SCORMAdapter(errorCallback) {
         }
     };
 
-    this.LMSSetValue = function (name, value) {
+    this.LMSSetValue = function () {
         var result = this._callAPIFunction("SetValue", arguments);
         result = eval(result.toString()); // Some APIs return "true" or "false"!
         if (!result) this._handleError();

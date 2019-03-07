@@ -59,9 +59,9 @@ function loadContent () {
 
     var sessionStart = new Date();
 
-    var messageHandler = new MessageHandler(window, sourceUrlParser.origin, ADAPTER);
+    new MessageHandler(window, sourceUrlParser.origin, ADAPTER);
 
-    window.addEventListener('beforeunload', function (e) {
+    window.addEventListener('beforeunload', function () {
         var sessionEnd = new Date();
         ADAPTER.setSessionTime(sessionEnd - sessionStart);
         ADAPTER.LMSCommit("");
