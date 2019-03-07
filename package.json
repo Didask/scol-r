@@ -15,9 +15,11 @@
     "SCORM",
     "CORS"
   ],
-  "husky": { "hooks": {
-      "pre-commit": "npm run build && lint-staged"
-  } },
+  "husky": {
+    "hooks": {
+      "pre-commit": "npm run build && git add dist/ && lint-staged"
+    }
+  },
   "author": "Didask",
   "license": "ISC",
   "bugs": {

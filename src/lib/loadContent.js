@@ -1,6 +1,6 @@
 import localizeMessage from './i18n'
-import SCORMAdapter from './SCORMAdapter'
 import MessageHandler from './MessageHandler'
+import SCORMAdapter from './SCORMAdapter'
 
 function loadContent () {
 
