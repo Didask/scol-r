@@ -1,0 +1,9 @@
+{
+  "src/**/*.{js}": [
+    "eslint --fix",
+    "git add"
+  ],
+  "dist/scol-r.js": [
+    "size-limit"
+  ]
+}

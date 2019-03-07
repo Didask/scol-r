@@ -1,0 +1,9 @@
+{
+    "sourceMaps": true,
+    "plugins": [
+      ["@babel/plugin-proposal-class-properties", {"loose": false}]
+    ],
+    "presets": [
+      ["@babel/env", {"useBuiltIns": "entry"}]
+    ]
+}

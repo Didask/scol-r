@@ -190,4 +190,6 @@ function SCORMAdapter(errorCallback) {
 
     this.initialize();
 
-};
+}
+
+export default SCORMAdapter

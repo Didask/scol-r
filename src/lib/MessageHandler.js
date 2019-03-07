@@ -20,3 +20,5 @@ function MessageHandler (win, sourceOrigin, adapter) {
     	adapter.setLessonStatus(lessonStatus);
     };
 }
+
+export default MessageHandler

@@ -20,9 +20,7 @@
   <resources>
     <resource adlcp:scormtype="sco" type="webcontent" identifier="resource_iframe" href="./index.html">
       <file href="./index.html"/>
-      <file href="./lib/SCORMAdapter.js"/>
-      <file href="./lib/MessageHandler.js"/>
-      <file href="./lib/loadContent.js"/>
+      <file href="./dist/scol-r.js"/>
     </resource>
   </resources>
 </manifest>
