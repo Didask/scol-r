@@ -1,0 +1,1 @@
+export const Arr = function(a,b,e){return Array.prototype.slice.call(a,b,e)}
