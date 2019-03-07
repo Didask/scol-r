@@ -1,5 +1,4 @@
-
-const messages = {
+const i18n_txt = {
     'en': {
         'pageTitle': 'Your content is loading...',
         'pageSubtitle': 'Please wait, or if your content doesn\'t appear, try closing and opening this window again.',
@@ -24,10 +23,6 @@ const messages = {
     }
 }
 
-export default function i18n (message) {
-    var locale = navigator.language || navigator.userLanguage;
-    if (locale) locale = locale.split(/[_-]/)[0];
-    if (!messages.hasOwnProperty(locale)) locale = 'en';
-    var localizedMessages = messages[locale];
-    return localizedMessages.hasOwnProperty(message) ? localizedMessages[message] : message;
+export default function i18n(str) {
+    return (i18n_txt[(navigator.language || navigator.userLanguage || 'en').split(/[_-]/)[0]] || i18n_txt['en'])[str] || str
 }
