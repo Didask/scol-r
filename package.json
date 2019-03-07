@@ -1,11 +1,11 @@
 {
   "name": "@didask/scol-r",
-  "version": "0.1.8",
+  "version": "0.1.9",
   "description": "Shareable Cross-Origin Learning Resources",
   "main": "index.html",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "rimraf dist && browserify src/index.js -t babelify -t uglifyify -o dist/scol-r.js"
+    "build": "rimraf dist && browserify src/index.js -p tinyify -t babelify -o dist/scol-r.js"
   },
   "repository": {
     "type": "git",
@@ -39,6 +39,6 @@
     "lint-staged": "^8.1.5",
     "rimraf": "^2.6.3",
     "size-limit": "^0.21.1",
-    "uglifyify": "^5.0.1"
+    "tinyify": "^2.5.0"
   }
 }
