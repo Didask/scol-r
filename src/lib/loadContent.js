@@ -1,39 +1,19 @@
-import localizeMessage from './i18n'
+import i18n from './i18n'
 import MessageHandler from './MessageHandler'
 import SCORMAdapter from './SCORMAdapter'
 
+import {InitError, RuntimeError} from './errors'
 import {$, $create} from './DOMHelpers'
-import {Arr} from './utils'
-
-function displayInitError (str) {
-    var box = $('.messages')
-    box && box.appendChild($create('p', {}, localizeMessage(str)))
-}
-
-function displayRuntimeError () {
-    var box = $('#runtime-error'),
-        args = Arr(arguments)
-    
-    box.innerHTML = ""
-    if (!args.length) return;
-    
-    box.innerHTML = '<h6>' + localizeMessage('runtimeErrorTitle') + '</h6>'
-    args.forEach(function (a) {
-        box.appendChild($create('p', {}, localizeMessage(a)))
-    })
-    setTimeout(function () {box.innerHTML = ''}, 3000)
-}
 
 function loadContent () {
 
-    $('#title').innerHTML = localizeMessage('pageTitle')
-    $('#subtitle').innerHTML = localizeMessage('pageSubtitle')
-    $('#footer-content').innerHTML = localizeMessage('pageFooter')
-    $('#title-error-messages').innerHTML = localizeMessage('pageErrorMessagesTitle')
+    $('#title').innerHTML = i18n('pageTitle')
+    $('#subtitle').innerHTML = i18n('pageSubtitle')
+    $('#footer-content').innerHTML = i18n('pageFooter')
+    $('#title-error-messages').innerHTML = i18n('pageErrorMessagesTitle')
 
     try {
-
-        var ADAPTER = new SCORMAdapter(displayRuntimeError),
+        var ADAPTER = new SCORMAdapter(RuntimeError),
             sourceUrl = document.body.getAttribute('data-source'),
             sessionStart = new Date(),
             learnerId = ADAPTER.getLearnerId();
@@ -68,7 +48,7 @@ function loadContent () {
         });
 
     } catch (error) {
-        displayInitError(error)
+        InitError(error)
     }
 }
 
