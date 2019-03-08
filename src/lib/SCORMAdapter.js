@@ -9,9 +9,9 @@ function SCORMAdapter(errorCallback) {
     };
 
     this.findAndSetAPI = function () {
-        var theAPI = this._findAPIInWindow(window);
-        if ((theAPI == null) && (window.opener != null) && (typeof(window.opener) != "undefined")) {
-          theAPI = this._findAPIInWindow(window.opener);
+        var theAPI = this._findAPIInWindow(global);
+        if ((theAPI == null) && (global.opener != null) && (typeof(global.opener) != "undefined")) {
+          theAPI = this._findAPIInWindow(global.opener);
         }
         if (theAPI == null) {
            console.error("Unable to find an API adapter");

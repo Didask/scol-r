@@ -15,12 +15,12 @@ function loadContent () {
     try {
         var ADAPTER = new SCORMAdapter(RuntimeError),
             sourceUrl = document.body.getAttribute('data-source'),
-            sessionStart = new Date(),
-            learnerId = ADAPTER.getLearnerId();
-
+            sessionStart = new Date()
 
         if (!ADAPTER.foundAPI()) { throw 'apiNotFound' }
         if (!ADAPTER.LMSInitialize("")) { throw 'couldNotInitialize' }
+
+        var learnerId = ADAPTER.getLearnerId();
         if (learnerId == null) { throw 'learnerIdMissing' }
 
 
