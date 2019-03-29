@@ -3,11 +3,33 @@
   <metadata>
     <schema>ADL SCORM</schema>
     <schemaversion>1.2</schemaversion>
-    <lom xmlns="http://ltsc.ieee.org/xsd/LOM">
-      <general>
-        <identifier>[[course-identifier]]</identifier>
-      </general>
-    </lom>
+    <imsmd:lom xmlns="http://ltsc.ieee.org/xsd/LOM">
+      <imsmd:general>
+        <imsmd:identifier>[[course-identifier]]</imsmd:identifier>
+      </imsmd:general>
+      <imsmd:lifecycle>
+        <imsmd:contribute>
+          <imsmd:role>
+            <imsmd:source>
+              <imsmd:langstring xml:lang="fr">LOMv1.0</imsmd:langstring>
+            </imsmd:source>
+            <imsmd:value>
+              <imsmd:langstring xml:lang="fr">Author</imsmd:langstring>
+            </imsmd:value>
+          </imsmd:role>
+          <imsmd:centity>
+            <imsmd:vcard>begin:vcard
+fn:[[course-author]]
+end:vcard</imsmd:vcard>
+          </imsmd:centity>
+        </imsmd:contribute>
+      </imsmd:lifecycle>
+      <imsmd:educational>
+        <imsmd:typicallearningtime>
+          <imsmd:datetime>[[course-typical-learning-time]]</imsmd:datetime>
+        </imsmd:typicallearningtime>
+      </imsmd:educational>
+    </imsmd:lom>
   </metadata>
   <organizations default="Org1">
     <organization identifier="Org1">
