@@ -9,10 +9,10 @@ export default class SCORMAdapter {
     private _isSCORM2004: boolean
     private _errorCallback: Function
 
-    constructor(errorCallback?: Function) {
+    constructor(errorCallback: Function = function(){}) {
         this._API = null
         this._isSCORM2004 = false
-        this._errorCallback = errorCallback ? errorCallback : function(){}
+        this._errorCallback =  errorCallback
         this._findAndSetAPI();
     }
 
