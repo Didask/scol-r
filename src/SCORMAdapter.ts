@@ -1,6 +1,6 @@
 interface ApiWindow extends Window {
-    API: any
-    API_1484_11: any
+    API?: any
+    API_1484_11?: any
 }
 
 export default class SCORMAdapter {
