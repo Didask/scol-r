@@ -154,6 +154,13 @@ export default class SCORMAdapter {
         this.LMSCommit();
     }
 
+    getScore() {
+        var CMIVariableName = this._isSCORM2004 ? 'cmi.score.scaled' : 'cmi.core.score.raw';
+        let score = this.LMSGetValue(CMIVariableName);
+        if (this._isSCORM2004) score = (score * 100);
+        return score
+    }
+
     setLessonStatus(lessonStatus: string) {
         if (this._isSCORM2004) {
             var successStatus = 'unknown';
