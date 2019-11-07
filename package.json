@@ -20,10 +20,12 @@
     "url": "https://github.com/Didask/scol-r/issues"
   },
   "homepage": "https://github.com/Didask/scol-r",
+  "dependencies": {
+    "xml2js": "0.4.22",
+    "@types/xml2js": "0.4.5"},
   "devDependencies": {
     "typescript": "3.6.3",
-    "husky": "3.0.5",
-    "@types/xml2js": "0.4.5"
+    "husky": "3.0.5"
   },
   "husky": {
     "hooks": {
