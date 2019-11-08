@@ -1,37 +1,41 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-var SCORMAdapter = /** @class */ (function () {
-    function SCORMAdapter(errorCallback) {
-        if (errorCallback === void 0) { errorCallback = function () { }; }
-        this._API = null;
-        this._isSCORM2004 = false;
-        this._errorCallback = errorCallback;
+interface ApiWindow extends Window {
+    API?: any
+    API_1484_11?: any
+}
+
+export default class SCORMAdapter {
+
+    private _API: any
+    private _isSCORM2004: boolean
+    private _errorCallback: Function
+
+    constructor(errorCallback: Function = function(){}) {
+        this._API = null
+        this._isSCORM2004 = false
+        this._errorCallback =  errorCallback
         this._findAndSetAPI();
     }
-    Object.defineProperty(SCORMAdapter.prototype, "foundAPI", {
-        get: function () { return !!this._API; },
-        enumerable: true,
-        configurable: true
-    });
-    ;
-    SCORMAdapter.prototype._findAndSetAPI = function () {
-        var theAPI = this._findAPIInWindow(window);
-        if ((theAPI == null) && (window.opener != null) && (typeof (window.opener) != "undefined")) {
-            theAPI = this._findAPIInWindow(window.opener);
+
+    get foundAPI() { return !!this._API };
+
+    private _findAndSetAPI() {
+        let theAPI = this._findAPIInWindow(window as unknown as ApiWindow);
+        if ((theAPI == null) && (window.opener != null) && (typeof(window.opener) != "undefined")) {
+          theAPI = this._findAPIInWindow(window.opener);
         }
         if (theAPI == null) {
-            console.error("Unable to find an API adapter");
-        }
-        else {
+           console.error("Unable to find an API adapter");
+        } else {
             this._API = theAPI["API"];
             this._isSCORM2004 = theAPI["isSCORM2004"];
         }
+
         if (this._API == null) {
             console.error("Couldn't find the API!");
         }
-    };
-    ;
-    SCORMAdapter.prototype._findAPIInWindow = function (win) {
+    }; 
+
+    private _findAPIInWindow(win: ApiWindow) {
         var findAPITries = 0;
         while ((win.API == null) && (win.API_1484_11 == null) && (win.parent != null) && (win.parent != win)) {
             findAPITries++;
@@ -39,15 +43,15 @@ var SCORMAdapter = /** @class */ (function () {
                 console.error("Error finding API -- too deeply nested.");
                 return null;
             }
-            win = win.parent;
+            win = win.parent as ApiWindow;
         }
+
         if (win.API) {
             return {
                 "API": win.API,
                 "isSCORM2004": false
             };
-        }
-        else if (win.API_1484_11) {
+        } else if (win.API_1484_11) {
             return {
                 "API": win.API_1484_11,
                 "isSCORM2004": true
@@ -55,148 +59,143 @@ var SCORMAdapter = /** @class */ (function () {
         }
         return null;
     };
-    ;
-    SCORMAdapter.prototype._callAPIFunction = function (fun, args) {
-        if (args === void 0) { args = [""]; }
+
+    private _callAPIFunction(fun: string, args: [(string | number)?, (string | number)?] = [""]) {
         if (this._API == null) {
             this._warnNOAPI();
             return;
-        }
-        if (this._isSCORM2004 && fun.indexOf('LMS') == 0) {
+        }   
+        if (this._isSCORM2004 && fun.indexOf('LMS')==0) {
             fun = fun.substr(3);
-        }
-        else if (!this._isSCORM2004 && !(fun.indexOf('LMS') == 0)) {
+        } else if (!this._isSCORM2004 && !(fun.indexOf('LMS') == 0)) {
             fun = 'LMS' + fun;
         }
         return this._API[fun].apply(this._API, args);
     };
-    ;
-    SCORMAdapter.prototype._handleError = function () {
+
+    private _handleError() {
         var lastErrorCode = this.LMSGetLastError();
         var lastErrorString = this.LMSGetErrorString(lastErrorCode);
         var lastErrorDiagnostic = this.LMSGetDiagnostic(lastErrorCode);
         if (lastErrorCode !== 0) {
-            console.warn("An error occured on the SCORM API:", "Error " + lastErrorCode + ": " + lastErrorString, lastErrorDiagnostic);
+            console.warn(
+                "An error occured on the SCORM API:",
+                "Error " + lastErrorCode + ": " + lastErrorString,
+                lastErrorDiagnostic
+            );
             this._errorCallback(lastErrorString, lastErrorDiagnostic && lastErrorDiagnostic != lastErrorCode ? lastErrorDiagnostic : null);
         }
     };
-    ;
-    SCORMAdapter.prototype._warnNOAPI = function () {
+
+    private _warnNOAPI() {
         console.warn("Cannot execute this function because the SCORM API is not available.");
-        this._errorCallback('apiNotFound');
+        this._errorCallback('apiNotFound')
     };
-    ;
-    SCORMAdapter.prototype.LMSInitialize = function () {
+
+    LMSInitialize() {
         var result = this._callAPIFunction("Initialize");
         result = eval(result.toString()) || this.LMSGetLastError() === 101; // Error 101 means that API is already initialized
-        if (!result)
-            this._handleError();
-        return result;
+        if (!result) this._handleError();
+        return result
     };
-    ;
-    SCORMAdapter.prototype.LMSTerminate = function () {
+
+    LMSTerminate() {
         var result = this._callAPIFunction(this._isSCORM2004 ? "Terminate" : "Finish");
         result = eval(result.toString()); // Some APIs return "true" or "false"!
-        if (!result)
-            this._handleError();
+        if (!result) this._handleError();
         return result;
     };
-    ;
-    SCORMAdapter.prototype.LMSGetValue = function (name) {
+
+    LMSGetValue(name: string) {
         var value = this._callAPIFunction("GetValue", [name]);
         if (this.LMSGetLastError() === 0) {
             return value;
-        }
-        else {
+        } else {
             this._handleError();
             return null;
         }
     };
-    ;
-    SCORMAdapter.prototype.LMSSetValue = function (name, value) {
+
+    LMSSetValue(name: string, value: string | number) {
         var result = this._callAPIFunction("SetValue", [name, value]);
         result = eval(result.toString()); // Some APIs return "true" or "false"!
-        if (!result)
-            this._handleError();
+        if (!result) this._handleError();
         return result.toString();
     };
-    ;
-    SCORMAdapter.prototype.LMSCommit = function () {
+
+    LMSCommit() {
         var result = this._callAPIFunction("Commit");
         result = eval(result.toString()); // Some APIs return "true" or "false"!
-        if (!result)
-            this._errorCallback('commitFailed');
+        if (!result) this._errorCallback('commitFailed');
         return result;
     };
-    ;
-    SCORMAdapter.prototype.LMSGetLastError = function () {
+
+    LMSGetLastError() {
         return parseInt(this._callAPIFunction("GetLastError"));
     };
-    ;
-    SCORMAdapter.prototype.LMSGetErrorString = function (errorCode) {
+
+    LMSGetErrorString(errorCode: number) {
         return this._callAPIFunction("GetErrorString", [errorCode]);
     };
-    ;
-    SCORMAdapter.prototype.LMSGetDiagnostic = function (errorCode) {
+
+    LMSGetDiagnostic(errorCode: number) {
         return this._callAPIFunction("GetDiagnostic", [errorCode]);
     };
-    ;
-    SCORMAdapter.prototype.getLearnerId = function () {
+
+    getLearnerId() {
         var CMIVariableName = this._isSCORM2004 ? "cmi.learner_id" : "cmi.core.student_id";
         return this.LMSGetValue(CMIVariableName);
     };
-    ;
-    SCORMAdapter.prototype.setScore = function (score) {
+
+    setScore(score: number) {
         var CMIVariableName = this._isSCORM2004 ? 'cmi.score.scaled' : 'cmi.core.score.raw';
-        if (this._isSCORM2004)
-            score = (score / 100);
+        if (this._isSCORM2004) score = (score / 100);
         this.LMSSetValue(CMIVariableName, score);
         this.LMSCommit();
-    };
-    SCORMAdapter.prototype.getScore = function () {
+    }
+
+    getScore() {
         var CMIVariableName = this._isSCORM2004 ? 'cmi.score.scaled' : 'cmi.core.score.raw';
-        var score = this.LMSGetValue(CMIVariableName);
-        if (this._isSCORM2004)
-            score = (score * 100);
-        return score;
-    };
-    SCORMAdapter.prototype.setLessonStatus = function (lessonStatus) {
+        let score = this.LMSGetValue(CMIVariableName);
+        if (this._isSCORM2004) score = (score * 100);
+        return score
+    }
+
+    setLessonStatus(lessonStatus: string) {
         if (this._isSCORM2004) {
             var successStatus = 'unknown';
-            if (lessonStatus === 'passed' || lessonStatus === 'failed')
-                successStatus = lessonStatus;
+            if (lessonStatus === 'passed' || lessonStatus === 'failed') successStatus = lessonStatus;
             this.LMSSetValue('cmi.success_status', successStatus);
             var completionStatus = 'unknown';
             if (lessonStatus === 'passed' || lessonStatus === 'completed') {
                 completionStatus = 'completed';
-            }
-            else if (lessonStatus === 'incomplete') {
+            } else if (lessonStatus === 'incomplete') {
                 completionStatus = 'incomplete';
-            }
-            else if (lessonStatus === 'not attempted' || lessonStatus === 'browsed') {
-                completionStatus = 'not attempted';
+            } else if (lessonStatus === 'not attempted' || lessonStatus === 'browsed') {
+                completionStatus = 'not attempted'
             }
             this.LMSSetValue('cmi.completion_status', completionStatus);
-        }
-        else {
+        } else {
             this.LMSSetValue('cmi.core.lesson_status', lessonStatus);
         }
         this.LMSCommit();
-    };
-    SCORMAdapter.prototype.setSessionTime = function (sessionTime) {
+    }
+
+    setSessionTime(sessionTime: number) {
         var CMIVariableName = this._isSCORM2004 ? 'cmi.session_time' : 'cmi.core.session_time';
+
         var hours = Math.floor(sessionTime / 1000 / 60 / 60);
         sessionTime -= hours * 1000 * 60 * 60;
         var minutes = Math.floor(sessionTime / 1000 / 60);
         sessionTime -= minutes * 1000 * 60;
         var seconds = Math.floor(sessionTime / 1000);
-        var formattedSeconds = seconds < 10 ? '0' + seconds : seconds;
-        var formattedMinutes = minutes < 10 ? '0' + minutes : minutes;
-        var formattedHours = hours < 10 ? '0' + hours : hours;
+
+        const formattedSeconds = seconds < 10 ? '0' + seconds : seconds
+        const formattedMinutes = minutes < 10 ? '0' + minutes : minutes
+        const formattedHours = hours < 10 ? '0' + hours : hours
+
         var duration = formattedHours + ':' + formattedMinutes + ':' + formattedSeconds;
         this.LMSSetValue(CMIVariableName, duration);
         this.LMSCommit();
-    };
-    return SCORMAdapter;
-}());
-exports.default = SCORMAdapter;
+    }
+}
