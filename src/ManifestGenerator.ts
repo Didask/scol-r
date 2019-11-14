@@ -22,7 +22,7 @@ const formatLearningTime = (learningTime: number) => {
 }
 
 
-export default function ManifestGenerator(courseId: string, courseTitle: string, courseAuthor: string, scoList: Sco[]) {
+export default function ManifestGenerator(courseId: string, courseTitle: string, courseAuthor: string, scoList: Sco[], sharedResources: string[]= []) {
   const courseGlobalLearningTime = scoList.reduce((acc, sco) => acc + sco.learningTime, 0)
   let manifest = require('../static/imsmanifest').default
   manifest = manifest.replace(/\[\[course-identifier\]\]/g, courseId)
@@ -41,8 +41,9 @@ export default function ManifestGenerator(courseId: string, courseTitle: string,
 
     let scoResource, scoItem
     scoList.forEach((sco) => {
-      scoResource = resourceTemplate.replace(/\[\[sco-identifier\]\]/g, sco.scoID)
-      data.manifest.resources[0].resource.push(JSON.parse(scoResource))
+      scoResource = JSON.parse(resourceTemplate.replace(/\[\[sco-identifier\]\]/g, sco.scoID))
+      sharedResources.forEach( resStr => scoResource.file.push( { '$': { href: resStr } }) )
+      data.manifest.resources[0].resource.push(scoResource)
 
       scoItem = itemTemplate.replace(/\[\[sco-identifier\]\]/g, sco.scoID)
       scoItem = scoItem.replace(/\[\[sco-title\]\]/g, sco.scoTitle)
