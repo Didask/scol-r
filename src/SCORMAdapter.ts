@@ -24,10 +24,10 @@ export default class SCORMAdapter {
         } else { 
             let theAPI = this._findAPIInWindow(window as unknown as ApiWindow);
             if ((theAPI == null) && (window.opener != null) && (typeof(window.opener) != "undefined")) {
-            theAPI = this._findAPIInWindow(window.opener);
+                theAPI = this._findAPIInWindow(window.opener);
             }
             if (theAPI == null) {
-            console.error("Unable to find an API adapter");
+                console.error("Unable to find an API adapter");
             } else {
                 this._API = theAPI["API"];
                 this._isSCORM2004 = theAPI["isSCORM2004"];

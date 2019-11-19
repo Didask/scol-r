@@ -22,7 +22,7 @@ const formatLearningTime = (learningTime: number) => {
 }
 
 
-export default function ManifestGenerator(courseId: string, courseTitle: string, courseAuthor: string, scoList: Sco[], sharedResources: string[]= []) {
+export default function ManifestGenerator(courseId: string, courseTitle: string, courseAuthor: string, scoList: Sco[], sharedResources: string[] = []) {
   const courseGlobalLearningTime = scoList.reduce((acc, sco) => acc + sco.learningTime, 0)
   let manifest = require('../static/imsmanifest').default
   manifest = manifest.replace(/\[\[course-identifier\]\]/g, courseId)
