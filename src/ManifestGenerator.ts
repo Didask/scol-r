@@ -21,14 +21,40 @@ const formatLearningTime = (learningTime: number) => {
   return hours + ':' + (minutes > 0 ? minutes : '00') + ':00'
 }
 
+export interface ManifestGeneratorProps {
+  courseId: string;
+  courseTitle: string;
+  courseAuthor: string;
+  scoList?: Sco[];
+  sharedResources?: string[];
+  totalLearningTime?: number;
+  dataFromLms?: string;
+}
 
-export default function ManifestGenerator(courseId: string, courseTitle: string, courseAuthor: string, scoList: Sco[], sharedResources: string[] = []) {
-  const courseGlobalLearningTime = scoList.reduce((acc, sco) => acc + sco.learningTime, 0)
-  let manifest = require('../static/imsmanifest').default
+
+export default function ManifestGenerator(props: ManifestGeneratorProps) {
+  const { 
+    courseId, courseTitle, courseAuthor, 
+    scoList = [], sharedResources = [], 
+    totalLearningTime = 0, dataFromLms
+  } = props
+  
+  const courseGlobalLearningTime = scoList.length ? scoList.reduce((acc, sco) => acc + sco.learningTime, 0) : totalLearningTime
+  let manifest = require('../static/imsmanifest').default as string
   manifest = manifest.replace(/\[\[course-identifier\]\]/g, courseId)
   manifest = manifest.replace(/\[\[course-title\]\]/g, courseTitle)
   manifest = manifest.replace(/\[\[course-author\]\]/g, courseAuthor)
   manifest = manifest.replace(/\[\[course-global-learning-time\]\]/g, formatLearningTime(courseGlobalLearningTime))
+  
+  if (!scoList.length) {
+    manifest = manifest.replace(/\[\[sco-identifier\]\]/g, courseId)
+    manifest = manifest.replace(/\[\[sco-title\]\]/g, courseTitle)
+    manifest = manifest.replace(/\[\[sco-author\]\]/g, courseAuthor)
+    manifest = manifest.replace(/\[\[data-from-lms\]\]/g,  dataFromLms ? dataFromLms : courseId)
+    manifest = manifest.replace(/\[\[sco-typical-learning-time\]\]/g, formatLearningTime(courseGlobalLearningTime))
+
+    return manifest
+  }
   
   parseString(manifest, (err, data) => {
     if (err) console.error(err)
@@ -41,7 +67,9 @@ export default function ManifestGenerator(courseId: string, courseTitle: string,
 
     let scoResource, scoItem
     scoList.forEach((sco) => {
-      scoResource = JSON.parse(resourceTemplate.replace(/\[\[sco-identifier\]\]/g, sco.scoID))
+      scoResource = resourceTemplate.replace(/\[\[sco-identifier\]\]/g, sco.scoID)
+      scoResource = scoResource.replace(/\[\[data-from-lms\]\]/g,  dataFromLms ? dataFromLms : (courseId + ':' + sco.scoID))
+      scoResource = JSON.parse(scoResource)
       sharedResources.forEach( resStr => scoResource.file.push( { '$': { href: resStr } }) )
       data.manifest.resources[0].resource.push(scoResource)
 
@@ -55,5 +83,5 @@ export default function ManifestGenerator(courseId: string, courseTitle: string,
     manifest = new Builder().buildObject(data)
   })
 
-  return manifest
+  return manifest.trim()
 }

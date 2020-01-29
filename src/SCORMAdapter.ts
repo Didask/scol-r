@@ -146,6 +146,10 @@ export default class SCORMAdapter {
         return this._callAPIFunction("GetDiagnostic", [errorCode]);
     };
 
+    getDataFromLMS() {
+        return this.LMSGetValue('cmi.launch_data');
+    };
+
     getLearnerId() {
         var CMIVariableName = this._isSCORM2004 ? "cmi.learner_id" : "cmi.core.student_id";
         return this.LMSGetValue(CMIVariableName);

@@ -37,7 +37,7 @@ end:vcard</imsmd:vcard>
       <title>[[course-title]]</title>
       <item identifier="item_[[sco-identifier]]" identifierref="resource_[[sco-identifier]]" isvisible="true">
         <title>[[sco-title]]</title>
-        <adlcp:dataFromLMS>[[course-identifier]]:[[sco-identifier]]</adlcp:dataFromLMS>
+        <adlcp:dataFromLMS>[[data-from-lms]]</adlcp:dataFromLMS>
         <metadata>
           <imsmd:lom xmlns="http://ltsc.ieee.org/xsd/LOM">
             <imsmd:general>
