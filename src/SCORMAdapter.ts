@@ -169,6 +169,11 @@ export default class SCORMAdapter {
         return score
     }
 
+    getLessonStatus() {
+        var CMIVariableName = this._isSCORM2004 ? 'cmi.completion_status' : 'cmi.core.lesson_status';
+        return this.LMSGetValue(CMIVariableName);
+    }
+
     setLessonStatus(lessonStatus: string) {
         if (this._isSCORM2004) {
             var successStatus = 'unknown';
@@ -205,5 +210,45 @@ export default class SCORMAdapter {
         var duration = formattedHours + ':' + formattedMinutes + ':' + formattedSeconds;
         this.LMSSetValue(CMIVariableName, duration);
         this.LMSCommit();
+    }
+
+    setObjectives(objectivesIds: string[]) {
+        objectivesIds.forEach((objectiveId, index) => {
+            this.LMSSetValue(`cmi.objectives.${index}.id`, objectiveId)
+        });
+    }
+
+    getObjectives() {
+        const objectives = []
+        const objectivesNbr = this.LMSGetValue('cmi.objectives._count')
+        for (let index = 0; index < objectivesNbr; index++) {
+            objectives.push(this.LMSGetValue(`cmi.objectives.${index}.id`));
+        }
+        return objectives
+    }
+
+    setObjectiveScore(objectiveId: string, score: number) {
+        const objectivesNbr = this.LMSGetValue('cmi.objectives._count')
+        for (let index = 0; index < objectivesNbr; index++) {
+            const storedObjectiveId = this.LMSGetValue(`cmi.objectives.${index}.id`);
+            if (objectiveId === storedObjectiveId) {
+                if (this._isSCORM2004) score = (score / 100);
+                this.LMSSetValue(`cmi.objectives.${index}.score.${this._isSCORM2004 ? 'scaled' : 'raw'}`, score);
+                this.LMSCommit();
+                return
+            }
+        }
+    }
+
+    getObjectiveScore(objectiveId: string) {
+        const objectivesNbr = this.LMSGetValue('cmi.objectives._count')
+        for (let index = 0; index < objectivesNbr; index++) {
+            const storedObjectiveId = this.LMSGetValue(`cmi.objectives.${index}.id`);
+            if (objectiveId === storedObjectiveId) {
+                let score = this.LMSGetValue(`cmi.objectives.${index}.score.${this._isSCORM2004 ? 'scaled' : 'raw'}`);
+                if (this._isSCORM2004) score = (score * 100);
+                return score
+            }
+        }
     }
 }
