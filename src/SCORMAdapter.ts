@@ -124,7 +124,7 @@ export default class SCORMAdapter {
         var result = this._callAPIFunction("SetValue", [name, value]);
         result = eval(result.toString()); // Some APIs return "true" or "false"!
         if (!result) this._handleError();
-        return result.toString();
+        return this.LMSCommit();
     };
 
     LMSCommit() {
@@ -159,7 +159,6 @@ export default class SCORMAdapter {
         var CMIVariableName = this._isSCORM2004 ? 'cmi.score.scaled' : 'cmi.core.score.raw';
         if (this._isSCORM2004) score = (score / 100);
         this.LMSSetValue(CMIVariableName, score);
-        this.LMSCommit();
     }
 
     getScore() {
@@ -191,7 +190,6 @@ export default class SCORMAdapter {
         } else {
             this.LMSSetValue('cmi.core.lesson_status', lessonStatus);
         }
-        this.LMSCommit();
     }
 
     setSessionTime(sessionTime: number) {
@@ -209,7 +207,6 @@ export default class SCORMAdapter {
 
         var duration = formattedHours + ':' + formattedMinutes + ':' + formattedSeconds;
         this.LMSSetValue(CMIVariableName, duration);
-        this.LMSCommit();
     }
 
     setObjectives(objectivesIds: string[]) {
@@ -234,7 +231,6 @@ export default class SCORMAdapter {
             if (objectiveId === storedObjectiveId) {
                 if (this._isSCORM2004) score = (score / 100);
                 this.LMSSetValue(`cmi.objectives.${index}.score.${this._isSCORM2004 ? 'scaled' : 'raw'}`, score);
-                this.LMSCommit();
                 return
             }
         }
