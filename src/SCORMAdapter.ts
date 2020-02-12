@@ -124,7 +124,7 @@ export default class SCORMAdapter {
         var result = this._callAPIFunction("SetValue", [name, value]);
         result = eval(result.toString()); // Some APIs return "true" or "false"!
         if (!result) this._handleError();
-        return result.toString();
+        return this.LMSCommit();
     };
 
     LMSCommit() {
@@ -146,6 +146,10 @@ export default class SCORMAdapter {
         return this._callAPIFunction("GetDiagnostic", [errorCode]);
     };
 
+    getDataFromLMS() {
+        return this.LMSGetValue('cmi.launch_data');
+    };
+
     getLearnerId() {
         var CMIVariableName = this._isSCORM2004 ? "cmi.learner_id" : "cmi.core.student_id";
         return this.LMSGetValue(CMIVariableName);
@@ -155,7 +159,6 @@ export default class SCORMAdapter {
         var CMIVariableName = this._isSCORM2004 ? 'cmi.score.scaled' : 'cmi.core.score.raw';
         if (this._isSCORM2004) score = (score / 100);
         this.LMSSetValue(CMIVariableName, score);
-        this.LMSCommit();
     }
 
     getScore() {
@@ -163,6 +166,11 @@ export default class SCORMAdapter {
         let score = this.LMSGetValue(CMIVariableName);
         if (this._isSCORM2004) score = (score * 100);
         return score
+    }
+
+    getLessonStatus() {
+        var CMIVariableName = this._isSCORM2004 ? 'cmi.completion_status' : 'cmi.core.lesson_status';
+        return this.LMSGetValue(CMIVariableName);
     }
 
     setLessonStatus(lessonStatus: string) {
@@ -182,7 +190,6 @@ export default class SCORMAdapter {
         } else {
             this.LMSSetValue('cmi.core.lesson_status', lessonStatus);
         }
-        this.LMSCommit();
     }
 
     setSessionTime(sessionTime: number) {
@@ -200,6 +207,44 @@ export default class SCORMAdapter {
 
         var duration = formattedHours + ':' + formattedMinutes + ':' + formattedSeconds;
         this.LMSSetValue(CMIVariableName, duration);
-        this.LMSCommit();
+    }
+
+    setObjectives(objectivesIds: string[]) {
+        objectivesIds.forEach((objectiveId, index) => {
+            this.LMSSetValue(`cmi.objectives.${index}.id`, objectiveId)
+        });
+    }
+
+    getObjectives() {
+        const objectives = []
+        const objectivesNbr = this.LMSGetValue('cmi.objectives._count')
+        for (let index = 0; index < objectivesNbr; index++) {
+            objectives.push(this.LMSGetValue(`cmi.objectives.${index}.id`));
+        }
+        return objectives
+    }
+
+    setObjectiveScore(objectiveId: string, score: number) {
+        const objectivesNbr = this.LMSGetValue('cmi.objectives._count')
+        for (let index = 0; index < objectivesNbr; index++) {
+            const storedObjectiveId = this.LMSGetValue(`cmi.objectives.${index}.id`);
+            if (objectiveId === storedObjectiveId) {
+                if (this._isSCORM2004) score = (score / 100);
+                this.LMSSetValue(`cmi.objectives.${index}.score.${this._isSCORM2004 ? 'scaled' : 'raw'}`, score);
+                return
+            }
+        }
+    }
+
+    getObjectiveScore(objectiveId: string) {
+        const objectivesNbr = this.LMSGetValue('cmi.objectives._count')
+        for (let index = 0; index < objectivesNbr; index++) {
+            const storedObjectiveId = this.LMSGetValue(`cmi.objectives.${index}.id`);
+            if (objectiveId === storedObjectiveId) {
+                let score = this.LMSGetValue(`cmi.objectives.${index}.score.${this._isSCORM2004 ? 'scaled' : 'raw'}`);
+                if (this._isSCORM2004) score = (score * 100);
+                return score
+            }
+        }
     }
 }
