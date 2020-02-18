@@ -1,4 +1,4 @@
-export default `
+export const indexhtml = `
 <!DOCTYPE html>
 <html>
     <head>

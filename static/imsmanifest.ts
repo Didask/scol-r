@@ -1,4 +1,4 @@
-export default `
+export const imsmanifest = `
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <manifest xmlns="http://www.imsproject.org/xsd/imscp_rootv1p1p2" identifier="[[course-identifier]]" version="1.0" xmlns:imsmd="http://www.imsglobal.org/xsd/imsmd_rootv1p2p1" xmlns:adlcp="http://www.adlnet.org/xsd/adlcp_rootv1p2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.imsproject.org/xsd/imscp_rootv1p1p2 imscp_rootv1p1p2.xsd http://www.imsglobal.org/xsd/imsmd_rootv1p2p1 imsmd_rootv1p2p1.xsd http://www.adlnet.org/xsd/adlcp_rootv1p2 adlcp_rootv1p2.xsd">
   <metadata>
