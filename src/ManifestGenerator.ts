@@ -32,7 +32,7 @@ export interface ManifestGeneratorProps {
 }
 
 
-export default function ManifestGenerator(props: ManifestGeneratorProps) {
+export function ManifestGenerator(props: ManifestGeneratorProps) {
   const { 
     courseId, courseTitle, courseAuthor, 
     scoList = [], sharedResources = [], 
@@ -40,7 +40,7 @@ export default function ManifestGenerator(props: ManifestGeneratorProps) {
   } = props
   
   const courseGlobalLearningTime = scoList.length ? scoList.reduce((acc, sco) => acc + sco.learningTime, 0) : totalLearningTime
-  let manifest = require('../static/imsmanifest').default as string
+  let manifest = require('../static/imsmanifest').imsmanifest as string
   manifest = manifest.replace(/\[\[course-identifier\]\]/g, courseId)
   manifest = manifest.replace(/\[\[course-title\]\]/g, courseTitle)
   manifest = manifest.replace(/\[\[course-author\]\]/g, courseAuthor)

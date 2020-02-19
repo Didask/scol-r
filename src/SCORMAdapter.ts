@@ -3,7 +3,7 @@ interface ApiWindow extends Window {
     API_1484_11?: any
 }
 
-export default class SCORMAdapter {
+export class SCORMAdapter {
 
     private _API: any
     private _isSCORM2004: boolean
