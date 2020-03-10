@@ -16,9 +16,10 @@ export class Sco {
 
 const formatLearningTime = (learningTime: number) => {
   const intHours = Math.floor(learningTime/60)
-  const hours = intHours > 10 ? '' + intHours : '0' + intHours
-  const minutes = intHours > 0 ? learningTime - intHours * 60 : learningTime
-  return hours + ':' + (minutes > 0 ? minutes : '00') + ':00'
+  const hours = intHours > 10 ? intHours : `0${intHours}`
+  const intMinutes = intHours > 0 ? learningTime - intHours * 60 : learningTime
+  const minutes = intMinutes > 10 ? intMinutes : `0${intMinutes}`
+  return `${hours}:${minutes}:00`
 }
 
 export interface ManifestGeneratorProps {
@@ -68,12 +69,12 @@ export function ManifestGenerator(props: ManifestGeneratorProps) {
     let scoResource, scoItem
     scoList.forEach((sco) => {
       scoResource = resourceTemplate.replace(/\[\[sco-identifier\]\]/g, sco.scoID)
-      scoResource = scoResource.replace(/\[\[data-from-lms\]\]/g,  dataFromLms ? dataFromLms : (courseId + ':' + sco.scoID))
       scoResource = JSON.parse(scoResource)
       sharedResources.forEach( resStr => scoResource.file.push( { '$': { href: resStr } }) )
       data.manifest.resources[0].resource.push(scoResource)
 
       scoItem = itemTemplate.replace(/\[\[sco-identifier\]\]/g, sco.scoID)
+      scoItem = scoItem.replace(/\[\[data-from-lms\]\]/g,  dataFromLms ? dataFromLms : (courseId + ':' + sco.scoID))
       scoItem = scoItem.replace(/\[\[sco-title\]\]/g, sco.scoTitle)
       scoItem = scoItem.replace(/\[\[sco-author\]\]/g, sco.author)
       scoItem = scoItem.replace(/\[\[sco-typical-learning-time\]\]/g, formatLearningTime(sco.learningTime))
