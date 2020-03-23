@@ -209,6 +209,10 @@ export class SCORMAdapter {
         this.LMSSetValue(CMIVariableName, duration);
     }
 
+    get objectivesAreAvailable() {
+        return this.LMSGetValue('cmi.objectives._children').length > 0
+    }
+
     setObjectives(objectivesIds: string[]) {
         objectivesIds.forEach((objectiveId, index) => {
             this.LMSSetValue(`cmi.objectives.${index}.id`, objectiveId)
@@ -247,4 +251,7 @@ export class SCORMAdapter {
             }
         }
     }
+
+    setSuspendData(data: string) { this.LMSSetValue('cmi.suspend_data', data) }
+    get suspendData() { return this.LMSGetValue('cmi.suspend_data') }
 }
