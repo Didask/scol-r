@@ -30,7 +30,7 @@ export interface ManifestGeneratorProps {
   sharedResources?: string[];
   totalLearningTime?: number;
   dataFromLms?: string;
-  scormVersion: '1.2' | '2004 3rd Edition' | '2004 4th Edition';
+  scormVersion?: '1.2' | '2004 3rd Edition' | '2004 4th Edition';
 }
 
 
