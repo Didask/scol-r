@@ -39,7 +39,7 @@ export function ManifestGenerator(props: ManifestGeneratorProps) {
     courseId, courseTitle, courseAuthor, 
     scoList = [], sharedResources = [], 
     totalLearningTime = 0, dataFromLms,
-    scormVersion
+    scormVersion = '1.2'
   } = props
   
   const courseGlobalLearningTime = scoList.length ? scoList.reduce((acc, sco) => acc + sco.learningTime, 0) : totalLearningTime
