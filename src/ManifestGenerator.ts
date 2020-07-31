@@ -30,6 +30,7 @@ export interface ManifestGeneratorProps {
   sharedResources?: string[];
   totalLearningTime?: number;
   dataFromLms?: string;
+  scormVersion: '1.2' | '2004 3rd Edition' | '2004 4th Edition';
 }
 
 
@@ -37,11 +38,13 @@ export function ManifestGenerator(props: ManifestGeneratorProps) {
   const { 
     courseId, courseTitle, courseAuthor, 
     scoList = [], sharedResources = [], 
-    totalLearningTime = 0, dataFromLms
+    totalLearningTime = 0, dataFromLms,
+    scormVersion
   } = props
   
   const courseGlobalLearningTime = scoList.length ? scoList.reduce((acc, sco) => acc + sco.learningTime, 0) : totalLearningTime
   let manifest = require('../static/imsmanifest').imsmanifest as string
+  manifest = manifest.replace(/\[\[scorm-version\]\]/g, scormVersion)
   manifest = manifest.replace(/\[\[course-identifier\]\]/g, courseId)
   manifest = manifest.replace(/\[\[course-title\]\]/g, courseTitle)
   manifest = manifest.replace(/\[\[course-author\]\]/g, courseAuthor)
