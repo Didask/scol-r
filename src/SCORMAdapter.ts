@@ -8,7 +8,7 @@ export class SCORMAdapter {
     private _API: any
     private _isSCORM2004: boolean
     private _errorCallback: Function
-    private _ignorableErrorCodes = [0, 403]
+    private _ignorableErrorCodes: { code: number; scope?: '1.2' | '2004' }[] = [{ code: 0 }, { code: 403, scope: '2004' }]
 
     constructor(errorCallback: Function = function(){}) {
         this._API = null
@@ -32,6 +32,7 @@ export class SCORMAdapter {
             } else {
                 this._API = theAPI["API"];
                 this._isSCORM2004 = theAPI["isSCORM2004"];
+                this._ignorableErrorCodes = this._ignorableErrorCodes.filter(({ scope }) => !scope || (this._isSCORM2004 ? scope === '2004' : scope === '1.2'))
             }
 
             if (this._API == null) {
@@ -82,7 +83,7 @@ export class SCORMAdapter {
         var lastErrorCode = this.LMSGetLastError();
         var lastErrorString = this.LMSGetErrorString(lastErrorCode);
         var lastErrorDiagnostic = this.LMSGetDiagnostic(lastErrorCode);
-        if (!this._ignorableErrorCodes.includes(lastErrorCode)) {
+        if (!this._ignorableErrorCodes.some(({ code }) => code === lastErrorCode)) {
             console.warn(
                 "An error occured on the SCORM API:",
                 "Error " + lastErrorCode + ": " + lastErrorString,
