@@ -8,6 +8,7 @@ export class SCORMAdapter {
     private _API: any
     private _isSCORM2004: boolean
     private _errorCallback: Function
+    private _ignorableErrorCodes = [0, 403]
 
     constructor(errorCallback: Function = function(){}) {
         this._API = null
@@ -81,7 +82,7 @@ export class SCORMAdapter {
         var lastErrorCode = this.LMSGetLastError();
         var lastErrorString = this.LMSGetErrorString(lastErrorCode);
         var lastErrorDiagnostic = this.LMSGetDiagnostic(lastErrorCode);
-        if (lastErrorCode !== 0) {
+        if (!this._ignorableErrorCodes.includes(lastErrorCode)) {
             console.warn(
                 "An error occured on the SCORM API:",
                 "Error " + lastErrorCode + ": " + lastErrorString,
@@ -192,20 +193,25 @@ export class SCORMAdapter {
         }
     }
 
-    setSessionTime(sessionTime: number) {
-        var CMIVariableName = this._isSCORM2004 ? 'cmi.session_time' : 'cmi.core.session_time';
+    setSessionTime(msSessionTime: number) {
+        var CMIVariableName = this._isSCORM2004 ? 'cmi.session_time' : 'cmi.core.session_time', duration;
 
-        var hours = Math.floor(sessionTime / 1000 / 60 / 60);
-        sessionTime -= hours * 1000 * 60 * 60;
-        var minutes = Math.floor(sessionTime / 1000 / 60);
-        sessionTime -= minutes * 1000 * 60;
-        var seconds = Math.floor(sessionTime / 1000);
+        if (this._isSCORM2004) {
+          duration = Math.round(msSessionTime / 1000)
+        } else {
+          var hours = Math.floor(msSessionTime / 1000 / 60 / 60);
+          msSessionTime -= hours * 1000 * 60 * 60;
+          var minutes = Math.floor(msSessionTime / 1000 / 60);
+          msSessionTime -= minutes * 1000 * 60;
+          var seconds = Math.floor(msSessionTime / 1000);
+  
+          const formattedSeconds = seconds < 10 ? '0' + seconds : seconds
+          const formattedMinutes = minutes < 10 ? '0' + minutes : minutes
+          const formattedHours = hours < 10 ? '0' + hours : hours
+  
+          duration = formattedHours + ':' + formattedMinutes + ':' + formattedSeconds;
+        }
 
-        const formattedSeconds = seconds < 10 ? '0' + seconds : seconds
-        const formattedMinutes = minutes < 10 ? '0' + minutes : minutes
-        const formattedHours = hours < 10 ? '0' + hours : hours
-
-        var duration = formattedHours + ':' + formattedMinutes + ':' + formattedSeconds;
         this.LMSSetValue(CMIVariableName, duration);
     }
 
