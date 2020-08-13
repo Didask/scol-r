@@ -76,6 +76,7 @@ export class SCORMAdapter {
         } else if (!this._isSCORM2004 && !(fun.indexOf('LMS') == 0)) {
             fun = 'LMS' + fun;
         }
+        console.info('[SCOL-R] Calling a scorm api function', { fun, args })
         return this._API[fun].apply(this._API, args);
     };
 
