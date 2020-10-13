@@ -1,16 +1,18 @@
-import { parseString, Builder } from 'xml2js'
+import { scormVersions } from '.'
 
 export class Sco {
   scoID: string
   scoTitle: string
   author: string
   learningTime: number
+  resources: string[]
 
-  constructor(scoID: string, scoTitle: string, author: string, learningTime: number) {
+  constructor(scoID: string, scoTitle: string, author: string, learningTime: number, resources?: string[]) {
     this.scoID = scoID
     this.scoTitle = scoTitle
     this.author = author
     this.learningTime = learningTime
+    this.resources = resources || []
   }
 }
 
@@ -30,7 +32,7 @@ export interface ManifestGeneratorProps {
   sharedResources?: string[];
   totalLearningTime?: number;
   dataFromLms?: string;
-  scormVersion?: '1.2' | '2004 3rd Edition' | '2004 4th Edition';
+  scormVersion?: typeof scormVersions[number];
 }
 
 
@@ -41,51 +43,108 @@ export function ManifestGenerator(props: ManifestGeneratorProps) {
     totalLearningTime = 0, dataFromLms,
     scormVersion = '1.2'
   } = props
-  
   const courseGlobalLearningTime = scoList.length ? scoList.reduce((acc, sco) => acc + sco.learningTime, 0) : totalLearningTime
-  let manifest = require('../static/imsmanifest').imsmanifest as string
-  manifest = manifest.replace(/\[\[scorm-version\]\]/g, scormVersion)
-  manifest = manifest.replace(/\[\[course-identifier\]\]/g, courseId)
-  manifest = manifest.replace(/\[\[course-title\]\]/g, courseTitle)
-  manifest = manifest.replace(/\[\[course-author\]\]/g, courseAuthor)
-  manifest = manifest.replace(/\[\[course-global-learning-time\]\]/g, formatLearningTime(courseGlobalLearningTime))
-  
-  if (!scoList.length) {
-    manifest = manifest.replace(/\[\[sco-identifier\]\]/g, courseId)
-    manifest = manifest.replace(/\[\[sco-title\]\]/g, courseTitle)
-    manifest = manifest.replace(/\[\[sco-author\]\]/g, courseAuthor)
-    manifest = manifest.replace(/\[\[data-from-lms\]\]/g,  dataFromLms ? dataFromLms : courseId)
-    manifest = manifest.replace(/\[\[sco-typical-learning-time\]\]/g, formatLearningTime(courseGlobalLearningTime))
 
-    return manifest
-  }
-  
-  parseString(manifest, (err, data) => {
-    if (err) console.error(err)
-
-    const resourceTemplate = JSON.stringify(data.manifest.resources[0].resource[0])
-    data.manifest.resources[0].resource = []
-
-    const itemTemplate = JSON.stringify(data.manifest.organizations[0].organization[0].item[0])
-    data.manifest.organizations[0].organization[0].item = []
-
-    let scoResource, scoItem
-    scoList.forEach((sco) => {
-      scoResource = resourceTemplate.replace(/\[\[sco-identifier\]\]/g, sco.scoID)
-      scoResource = JSON.parse(scoResource)
-      sharedResources.forEach( resStr => scoResource.file.push( { '$': { href: resStr } }) )
-      data.manifest.resources[0].resource.push(scoResource)
-
-      scoItem = itemTemplate.replace(/\[\[sco-identifier\]\]/g, sco.scoID)
-      scoItem = scoItem.replace(/\[\[data-from-lms\]\]/g,  dataFromLms ? dataFromLms : (courseId + ':' + sco.scoID))
-      scoItem = scoItem.replace(/\[\[sco-title\]\]/g, sco.scoTitle)
-      scoItem = scoItem.replace(/\[\[sco-author\]\]/g, sco.author)
-      scoItem = scoItem.replace(/\[\[sco-typical-learning-time\]\]/g, formatLearningTime(sco.learningTime))
-      data.manifest.organizations[0].organization[0].item.push(JSON.parse(scoItem))
-    })
-
-    manifest = new Builder().buildObject(data)
-  })
-
-  return manifest.trim()
+  return (
+    `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+    <manifest xmlns="http://www.imsproject.org/xsd/imscp_rootv1p1p2" identifier="${courseId}" version="1.0" xmlns:imsmd="http://www.imsglobal.org/xsd/imsmd_rootv1p2p1" xmlns:adlcp="http://www.adlnet.org/xsd/adlcp_rootv1p2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.imsproject.org/xsd/imscp_rootv1p1p2 imscp_rootv1p1p2.xsd http://www.imsglobal.org/xsd/imsmd_rootv1p2p1 imsmd_rootv1p2p1.xsd http://www.adlnet.org/xsd/adlcp_rootv1p2 adlcp_rootv1p2.xsd">
+      <metadata>
+        <schema>ADL SCORM</schema>
+        <schemaversion>${scormVersion}</schemaversion>
+        <imsmd:lom xmlns="http://ltsc.ieee.org/xsd/LOM">
+          <imsmd:general>
+            <imsmd:identifier>${courseId}</imsmd:identifier>
+          </imsmd:general>
+          <imsmd:lifecycle>
+            <imsmd:contribute>
+              <imsmd:role>
+                <imsmd:source>
+                  <imsmd:langstring xml:lang="fr">LOMv1.0</imsmd:langstring>
+                </imsmd:source>
+                <imsmd:value>
+                  <imsmd:langstring xml:lang="fr">Author</imsmd:langstring>
+                </imsmd:value>
+              </imsmd:role>
+              <imsmd:centity>
+                <imsmd:vcard>
+                  begin:vcard
+                  fn:${courseAuthor}
+                  end:vcard
+                </imsmd:vcard>
+              </imsmd:centity>
+            </imsmd:contribute>
+          </imsmd:lifecycle>
+          <imsmd:educational>
+            <imsmd:typicallearningtime>
+              <imsmd:datetime>${formatLearningTime(courseGlobalLearningTime)}</imsmd:datetime>
+            </imsmd:typicallearningtime>
+          </imsmd:educational>
+        </imsmd:lom>
+      </metadata>
+      <organizations default="Org1">
+        <organization identifier="Org1">
+          <title>${courseTitle}</title>
+          ${scoList.map(sco => {
+            return (
+              `<item identifier="item_${sco.scoID}" identifierref="resource_${sco.scoID}" isvisible="true">
+                <title>${sco.scoTitle}</title>
+                <adlcp:dataFromLMS>${dataFromLms ?? (courseId + ':' + sco.scoID)}</adlcp:dataFromLMS>
+                <metadata>
+                  <imsmd:lom xmlns="http://ltsc.ieee.org/xsd/LOM">
+                    <imsmd:general>
+                    <imsmd:identifier>${sco.scoID}</imsmd:identifier>
+                    </imsmd:general>
+                    <imsmd:lifecycle>
+                    <imsmd:contribute>
+                      <imsmd:role>
+                      <imsmd:source>
+                        <imsmd:langstring xml:lang="fr">LOMv1.0</imsmd:langstring>
+                      </imsmd:source>
+                      <imsmd:value>
+                        <imsmd:langstring xml:lang="fr">Author</imsmd:langstring>
+                      </imsmd:value>
+                      </imsmd:role>
+                      <imsmd:centity>
+                        <imsmd:vcard>
+                          begin:vcard
+                          fn:${sco.author}
+                          end:vcard
+                        </imsmd:vcard>
+                      </imsmd:centity>
+                    </imsmd:contribute>
+                    </imsmd:lifecycle>
+                    <imsmd:educational>
+                    <imsmd:typicallearningtime>
+                      <imsmd:datetime>${sco.learningTime}</imsmd:datetime>
+                    </imsmd:typicallearningtime>
+                    </imsmd:educational>
+                  </imsmd:lom>
+                </metadata>
+              </item>`
+            )
+          }).join('\n')}
+        </organization>
+      </organizations>
+      <resources>
+      ${sharedResources?.length ? (
+          `<resource adlcp:scormtype="asset" type="webcontent" identifier="shared_resources">
+            ${sharedResources.map(resource => {
+              return `<file href="${resource}"/>`
+            }).join('\n')}
+          </resource>`
+        ) : ''
+      }
+      ${scoList.map(sco => {
+        return (
+          `<resource adlcp:scormtype="sco" type="webcontent" identifier="resource_${sco.scoID}" href="./${sco.scoID}/index.html">
+            ${sharedResources?.length ? '<dependency identifierref="shared_resources"/>' : ''}
+            ${sco.resources.map(resource => {
+              return `<file href="${resource}"/>`
+            }).join('\n')}
+          </resource>`
+        )
+      }).join('\n')}
+      </resources>
+    </manifest>`
+  )
 }
