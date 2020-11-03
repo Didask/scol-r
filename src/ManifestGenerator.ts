@@ -115,7 +115,7 @@ export function ManifestGenerator(props: ManifestGeneratorProps) {
                     </imsmd:lifecycle>
                     <imsmd:educational>
                     <imsmd:typicallearningtime>
-                      <imsmd:datetime>${sco.learningTime}</imsmd:datetime>
+                      <imsmd:datetime>${formatLearningTime(sco.learningTime)}</imsmd:datetime>
                     </imsmd:typicallearningtime>
                     </imsmd:educational>
                   </imsmd:lom>
