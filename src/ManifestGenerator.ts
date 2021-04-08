@@ -35,14 +35,19 @@ export interface ManifestGeneratorProps {
   scormVersion?: typeof scormVersions[number];
 }
 
+const removeSpecialChars = <T>(obj: T): T => (
+  Object.entries(obj).reduce((acc, [key, value]) => ({
+    ...acc,
+    [key]: value.replace(/&/g, '-')
+  }), {} as T)
+)
 
-export function ManifestGenerator(props: ManifestGeneratorProps) {
-  const { 
-    courseId, courseTitle, courseAuthor, 
-    scoList = [], sharedResources = [], 
+export function ManifestGenerator({ 
+    courseId, scoList = [], sharedResources = [], 
     totalLearningTime = 0, dataFromLms,
-    scormVersion = '1.2'
-  } = props
+    scormVersion = '1.2', ...props
+  }: ManifestGeneratorProps) {
+  const { courseTitle, courseAuthor } = removeSpecialChars<Partial<ManifestGeneratorProps>>(props)
   const courseGlobalLearningTime = scoList.length ? scoList.reduce((acc, sco) => acc + sco.learningTime, 0) : totalLearningTime
 
   return (
@@ -84,15 +89,16 @@ export function ManifestGenerator(props: ManifestGeneratorProps) {
       <organizations default="Org1">
         <organization identifier="Org1">
           <title>${courseTitle}</title>
-          ${scoList.map(sco => {
+          ${scoList.map(({ scoID, learningTime, resources, ...props }) => {
+            const { scoTitle, author } = removeSpecialChars<Partial<Sco>>(props)
             return (
-              `<item identifier="item_${sco.scoID}" identifierref="resource_${sco.scoID}" isvisible="true">
-                <title>${sco.scoTitle}</title>
-                <adlcp:dataFromLMS>${dataFromLms ?? (courseId + ':' + sco.scoID)}</adlcp:dataFromLMS>
+              `<item identifier="item_${scoID}" identifierref="resource_${scoID}" isvisible="true">
+                <title>${scoTitle}</title>
+                <adlcp:dataFromLMS>${dataFromLms ?? (courseId + ':' + scoID)}</adlcp:dataFromLMS>
                 <metadata>
                   <imsmd:lom xmlns="http://ltsc.ieee.org/xsd/LOM">
                     <imsmd:general>
-                    <imsmd:identifier>${sco.scoID}</imsmd:identifier>
+                    <imsmd:identifier>${scoID}</imsmd:identifier>
                     </imsmd:general>
                     <imsmd:lifecycle>
                     <imsmd:contribute>
@@ -107,7 +113,7 @@ export function ManifestGenerator(props: ManifestGeneratorProps) {
                       <imsmd:centity>
                         <imsmd:vcard>
                           begin:vcard
-                          fn:${sco.author}
+                          fn:${author}
                           end:vcard
                         </imsmd:vcard>
                       </imsmd:centity>
@@ -115,7 +121,7 @@ export function ManifestGenerator(props: ManifestGeneratorProps) {
                     </imsmd:lifecycle>
                     <imsmd:educational>
                     <imsmd:typicallearningtime>
-                      <imsmd:datetime>${formatLearningTime(sco.learningTime)}</imsmd:datetime>
+                      <imsmd:datetime>${formatLearningTime(learningTime)}</imsmd:datetime>
                     </imsmd:typicallearningtime>
                     </imsmd:educational>
                   </imsmd:lom>

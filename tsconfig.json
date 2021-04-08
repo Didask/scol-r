@@ -5,7 +5,7 @@
       "module": "commonjs",
       "target": "es5",
       "lib": [
-        "es2015",
+        "es2017",
         "dom"
       ],
       "emitDecoratorMetadata": true,
@@ -17,6 +17,6 @@
       "noUnusedParameters": true
     },
     "include": [
-      "./src/SCORMAdapter.ts"
+      "./src/*.ts"
     ]
   }
