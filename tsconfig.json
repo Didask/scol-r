@@ -2,6 +2,7 @@
     "compilerOptions": {
       "outDir": "./lib",
       "noImplicitAny": true,
+      "declaration": true,
       "module": "commonjs",
       "target": "es5",
       "lib": [
@@ -14,9 +15,12 @@
       "esModuleInterop": true,
       "isolatedModules": true,
       "noUnusedLocals": true,
-      "noUnusedParameters": true
+      "noUnusedParameters": true,
+      "allowJs": true
     },
     "include": [
-      "./src/*.ts"
-    ]
+      "./src/*.ts",
+      "./src/*.js"
+    ],
+    "exclude": ["node_modules"]
   }
