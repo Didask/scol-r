@@ -28,7 +28,7 @@ export class SCORMAdapter {
       console.error("Unable to find an API adapter");
     } else {
       let theAPI = this._findAPIInWindow(window as unknown as ApiWindow);
-      if (theAPI == null && window.opener != null && typeof window.opener != "undefined") {
+      if (theAPI == null && window.opener != null) {
         theAPI = this._findAPIInWindow(window.opener);
       }
       if (theAPI == null) {
@@ -79,7 +79,7 @@ export class SCORMAdapter {
     }
     if (this._isSCORM2004 && fun.indexOf("LMS") == 0) {
       fun = fun.substr(3);
-    } else if (!this._isSCORM2004 && !(fun.indexOf("LMS") == 0)) {
+    } else if (!this._isSCORM2004 && fun.indexOf("LMS") != 0) {
       fun = "LMS" + fun;
     }
     console.info("[SCOL-R] Calling a scorm api function", { fun, args });
@@ -168,15 +168,14 @@ export class SCORMAdapter {
   }
 
   setScore(score: number) {
-    var CMIVariableName = this._isSCORM2004 ? "cmi.score.scaled" : "cmi.core.score.raw";
-    if (this._isSCORM2004) score = score / 100;
-    this.LMSSetValue(CMIVariableName, score);
+    if (this._isSCORM2004) {
+      this.LMSSetValue("cmi.score.scaled", score / 100);
+    }
+    this.LMSSetValue("cmi.core.score.raw", score);
   }
 
   getScore() {
-    var CMIVariableName = this._isSCORM2004 ? "cmi.score.scaled" : "cmi.core.score.raw";
-    let score = this.LMSGetValue(CMIVariableName);
-    if (this._isSCORM2004) score = score * 100;
+    let score = this.LMSGetValue("cmi.core.score.raw");
     return score;
   }
 
@@ -251,8 +250,10 @@ export class SCORMAdapter {
     for (let index = 0; index < objectivesNbr; index++) {
       const storedObjectiveId = this.LMSGetValue(`cmi.objectives.${index}.id`);
       if (objectiveId === storedObjectiveId) {
-        if (this._isSCORM2004) score = score / 100;
-        this.LMSSetValue(`cmi.objectives.${index}.score.${this._isSCORM2004 ? "scaled" : "raw"}`, score);
+        if (this._isSCORM2004) {
+          this.LMSSetValue(`cmi.objectives.${index}.score.scaled`, score / 100);
+        }
+        this.LMSSetValue(`cmi.objectives.${index}.score.raw`, score);
         return;
       }
     }
@@ -263,8 +264,7 @@ export class SCORMAdapter {
     for (let index = 0; index < objectivesNbr; index++) {
       const storedObjectiveId = this.LMSGetValue(`cmi.objectives.${index}.id`);
       if (objectiveId === storedObjectiveId) {
-        let score = this.LMSGetValue(`cmi.objectives.${index}.score.${this._isSCORM2004 ? "scaled" : "raw"}`);
-        if (this._isSCORM2004) score = score * 100;
+        const score = this.LMSGetValue(`cmi.objectives.${index}.score.raw`);
         return score;
       }
     }
