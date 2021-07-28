@@ -146,4 +146,8 @@ function loadContent() {
   }
   var sourceOrigin = sourceUrlParser.protocol + "//" + host;
   new MessageHandler(window, sourceOrigin, ADAPTER);
+
+  window.addEventListener("beforeunload", function (e) {
+    ADAPTER.LMSTerminate();
+  });
 }
