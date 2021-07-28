@@ -99,14 +99,14 @@ export class SCORMAdapter {
     return this._API[fun].apply(this._API, args);
   }
 
-  private _handleError() {
+  private _handleError(functionName: string) {
     var lastErrorCode = this.LMSGetLastError();
     var lastErrorString = this.LMSGetErrorString(lastErrorCode);
     var lastErrorDiagnostic = this.LMSGetDiagnostic(lastErrorCode);
     if (!this._ignorableErrorCodes.some(({ code }) => code === lastErrorCode)) {
       console.warn(
-        "An error occured on the SCORM API:",
-        "Error " + lastErrorCode + ": " + lastErrorString,
+        functionName,
+        `An error occured on the SCORM API: code ${lastErrorCode}, message: ${lastErrorString}`,
         lastErrorDiagnostic
       );
       this._errorCallback(
@@ -126,43 +126,44 @@ export class SCORMAdapter {
   }
 
   LMSInitialize() {
-    var result = this._callAPIFunction("Initialize");
-    result = eval(result.toString()) || this.LMSGetLastError() === 101; // Error 101 means that API is already initialized
-    if (!result) this._handleError();
-    return result;
+    var functionName = "Initialize";
+    var result = this._callAPIFunction(functionName);
+    var lastErrorCode = this.LMSGetLastError();
+    var success =
+      eval(result.toString()) ||
+      (this._isSCORM2004
+        ? lastErrorCode === 103 // 103 in 2004.* = already initialized
+        : lastErrorCode === 101); // 101 in 1.2 = already initialized
+    return success || this._handleError(functionName);
   }
 
   LMSTerminate() {
-    var result = this._callAPIFunction(
-      this._isSCORM2004 ? "Terminate" : "Finish"
-    );
-    result = eval(result.toString()); // Some APIs return "true" or "false"!
-    if (!result) this._handleError();
-    return result;
+    var functionName = this._isSCORM2004 ? "Terminate" : "Finish";
+    var result = this._callAPIFunction(functionName);
+    var success = eval(result.toString());
+    return success || this._handleError(functionName);
   }
 
   LMSGetValue(name: string) {
-    var value = this._callAPIFunction("GetValue", [name]);
-    if (this.LMSGetLastError() === 0) {
-      return value;
-    } else {
-      this._handleError();
-      return null;
-    }
+    var functionName = "GetValue";
+    var value = this._callAPIFunction(functionName, [name]);
+    var success = this.LMSGetLastError() === 0;
+    return success ? value : this._handleError(`${functionName}: ${name}`);
   }
 
   LMSSetValue(name: string, value: string | number) {
-    var result = this._callAPIFunction("SetValue", [name, value]);
-    result = eval(result.toString()); // Some APIs return "true" or "false"!
-    if (!result) this._handleError();
-    return this.LMSCommit();
+    var functionName = "SetValue";
+    var result = this._callAPIFunction(functionName, [name, value]);
+    var success = eval(result.toString());
+    return success
+      ? this.LMSCommit()
+      : this._handleError(`${functionName}: {${name}: ${value}}`);
   }
 
   LMSCommit() {
     var result = this._callAPIFunction("Commit");
-    result = eval(result.toString()); // Some APIs return "true" or "false"!
-    if (!result) this._errorCallback("commitFailed");
-    return result;
+    var success = eval(result.toString());
+    return success || this._errorCallback("commitFailed");
   }
 
   LMSGetLastError() {
@@ -190,18 +191,16 @@ export class SCORMAdapter {
 
   setScore(score: number) {
     var CMIVariableName = this._isSCORM2004
-      ? "cmi.score.scaled"
+      ? "cmi.score.raw"
       : "cmi.core.score.raw";
-    if (this._isSCORM2004) score = score / 100;
     this.LMSSetValue(CMIVariableName, score);
   }
 
   getScore() {
     var CMIVariableName = this._isSCORM2004
-      ? "cmi.score.scaled"
+      ? "cmi.score.raw"
       : "cmi.core.score.raw";
     let score = this.LMSGetValue(CMIVariableName);
-    if (this._isSCORM2004) score = score * 100;
     return score;
   }
 
