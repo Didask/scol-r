@@ -109,7 +109,7 @@ export function ManifestGenerator({
             .map(({ scoID, learningTime, resources, ...props }) => {
               const { scoTitle, author } =
                 removeSpecialChars<Partial<Sco>>(props);
-              return `<item identifier="item_${scoID}" identifierref="resource_${scoID}" isvisible="true">
+              return `<item identifier="${scoTitle}" identifierref="resource_${scoID}" isvisible="true">
                 <title>${scoTitle}</title>
                 <adlcp:dataFromLMS>${
                   dataFromLms ?? courseId + ":" + scoID
