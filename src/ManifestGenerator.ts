@@ -1,28 +1,34 @@
-import { scormVersions } from '.'
+import { scormVersions } from ".";
 
 export class Sco {
-  scoID: string
-  scoTitle: string
-  author: string
-  learningTime: number
-  resources: string[]
+  scoID: string;
+  scoTitle: string;
+  author: string;
+  learningTime: number;
+  resources: string[];
 
-  constructor(scoID: string, scoTitle: string, author: string, learningTime: number, resources?: string[]) {
-    this.scoID = scoID
-    this.scoTitle = scoTitle
-    this.author = author
-    this.learningTime = learningTime
-    this.resources = resources || []
+  constructor(
+    scoID: string,
+    scoTitle: string,
+    author: string,
+    learningTime: number,
+    resources?: string[]
+  ) {
+    this.scoID = scoID;
+    this.scoTitle = scoTitle;
+    this.author = author;
+    this.learningTime = learningTime;
+    this.resources = resources || [];
   }
 }
 
 const formatLearningTime = (learningTime: number) => {
-  const intHours = Math.floor(learningTime/60)
-  const hours = intHours > 10 ? intHours : `0${intHours}`
-  const intMinutes = intHours > 0 ? learningTime - intHours * 60 : learningTime
-  const minutes = intMinutes > 10 ? intMinutes : `0${intMinutes}`
-  return `${hours}:${minutes}:00`
-}
+  const intHours = Math.floor(learningTime / 60);
+  const hours = intHours > 10 ? intHours : `0${intHours}`;
+  const intMinutes = intHours > 0 ? learningTime - intHours * 60 : learningTime;
+  const minutes = intMinutes > 10 ? intMinutes : `0${intMinutes}`;
+  return `${hours}:${minutes}:00`;
+};
 
 export interface ManifestGeneratorProps {
   courseId: string;
@@ -35,23 +41,31 @@ export interface ManifestGeneratorProps {
   scormVersion?: typeof scormVersions[number];
 }
 
-const removeSpecialChars = <T>(obj: T): T => (
-  Object.entries(obj).reduce((acc, [key, value]) => ({
-    ...acc,
-    [key]: value.replace(/&/g, '-')
-  }), {} as T)
-)
+const removeSpecialChars = <T>(obj: T): T =>
+  Object.entries(obj).reduce(
+    (acc, [key, value]) => ({
+      ...acc,
+      [key]: value.replace(/&/g, "-"),
+    }),
+    {} as T
+  );
 
-export function ManifestGenerator({ 
-    courseId, scoList = [], sharedResources = [], 
-    totalLearningTime = 0, dataFromLms,
-    scormVersion = '1.2', ...props
-  }: ManifestGeneratorProps) {
-  const { courseTitle, courseAuthor } = removeSpecialChars<Partial<ManifestGeneratorProps>>(props)
-  const courseGlobalLearningTime = scoList.length ? scoList.reduce((acc, sco) => acc + sco.learningTime, 0) : totalLearningTime
+export function ManifestGenerator({
+  courseId,
+  scoList = [],
+  sharedResources = [],
+  totalLearningTime = 0,
+  dataFromLms,
+  scormVersion = "1.2",
+  ...props
+}: ManifestGeneratorProps) {
+  const { courseTitle, courseAuthor } =
+    removeSpecialChars<Partial<ManifestGeneratorProps>>(props);
+  const courseGlobalLearningTime = scoList.length
+    ? scoList.reduce((acc, sco) => acc + sco.learningTime, 0)
+    : totalLearningTime;
 
-  return (
-    `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+  return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
     <manifest xmlns="http://www.imsproject.org/xsd/imscp_rootv1p1p2" identifier="${courseId}" version="1.0" xmlns:imsmd="http://www.imsglobal.org/xsd/imsmd_rootv1p2p1" xmlns:adlcp="http://www.adlnet.org/xsd/adlcp_rootv1p2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.imsproject.org/xsd/imscp_rootv1p1p2 imscp_rootv1p1p2.xsd http://www.imsglobal.org/xsd/imsmd_rootv1p2p1 imsmd_rootv1p2p1.xsd http://www.adlnet.org/xsd/adlcp_rootv1p2 adlcp_rootv1p2.xsd">
       <metadata>
         <schema>ADL SCORM</schema>
@@ -81,7 +95,9 @@ export function ManifestGenerator({
           </imsmd:lifecycle>
           <imsmd:educational>
             <imsmd:typicallearningtime>
-              <imsmd:datetime>${formatLearningTime(courseGlobalLearningTime)}</imsmd:datetime>
+              <imsmd:datetime>${formatLearningTime(
+                courseGlobalLearningTime
+              )}</imsmd:datetime>
             </imsmd:typicallearningtime>
           </imsmd:educational>
         </imsmd:lom>
@@ -89,12 +105,15 @@ export function ManifestGenerator({
       <organizations default="Org1">
         <organization identifier="Org1">
           <title>${courseTitle}</title>
-          ${scoList.map(({ scoID, learningTime, resources, ...props }) => {
-            const { scoTitle, author } = removeSpecialChars<Partial<Sco>>(props)
-            return (
-              `<item identifier="item_${scoID}" identifierref="resource_${scoID}" isvisible="true">
+          ${scoList
+            .map(({ scoID, learningTime, resources, ...props }) => {
+              const { scoTitle, author } =
+                removeSpecialChars<Partial<Sco>>(props);
+              return `<item identifier="item_${scoID}" identifierref="resource_${scoID}" isvisible="true">
                 <title>${scoTitle}</title>
-                <adlcp:dataFromLMS>${dataFromLms ?? (courseId + ':' + scoID)}</adlcp:dataFromLMS>
+                <adlcp:dataFromLMS>${
+                  dataFromLms ?? courseId + ":" + scoID
+                }</adlcp:dataFromLMS>
                 <metadata>
                   <imsmd:lom xmlns="http://ltsc.ieee.org/xsd/LOM">
                     <imsmd:general>
@@ -121,36 +140,48 @@ export function ManifestGenerator({
                     </imsmd:lifecycle>
                     <imsmd:educational>
                     <imsmd:typicallearningtime>
-                      <imsmd:datetime>${formatLearningTime(learningTime)}</imsmd:datetime>
+                      <imsmd:datetime>${formatLearningTime(
+                        learningTime
+                      )}</imsmd:datetime>
                     </imsmd:typicallearningtime>
                     </imsmd:educational>
                   </imsmd:lom>
                 </metadata>
-              </item>`
-            )
-          }).join('\n')}
+              </item>`;
+            })
+            .join("\n")}
         </organization>
       </organizations>
       <resources>
-      ${sharedResources?.length ? (
-          `<resource adlcp:scormtype="asset" type="webcontent" identifier="shared_resources">
-            ${sharedResources.map(resource => {
-              return `<file href="${resource}"/>`
-            }).join('\n')}
+      ${
+        sharedResources?.length
+          ? `<resource adlcp:scormtype="asset" type="webcontent" identifier="shared_resources">
+            ${sharedResources
+              .map((resource) => {
+                return `<file href="${resource}"/>`;
+              })
+              .join("\n")}
           </resource>`
-        ) : ''
+          : ""
       }
-      ${scoList.map(sco => {
-        return (
-          `<resource adlcp:scormtype="sco" type="webcontent" identifier="resource_${sco.scoID}" href="./${sco.scoID}/index.html">
-            ${sharedResources?.length ? '<dependency identifierref="shared_resources"/>' : ''}
-            ${sco.resources.map(resource => {
-              return `<file href="${resource}"/>`
-            }).join('\n')}
-          </resource>`
-        )
-      }).join('\n')}
+      ${scoList
+        .map((sco) => {
+          return `<resource adlcp:scormtype="sco" type="webcontent" identifier="resource_${
+            sco.scoID
+          }" href="./${sco.scoID}/index.html">
+            ${
+              sharedResources?.length
+                ? '<dependency identifierref="shared_resources"/>'
+                : ""
+            }
+            ${sco.resources
+              .map((resource) => {
+                return `<file href="${resource}"/>`;
+              })
+              .join("\n")}
+          </resource>`;
+        })
+        .join("\n")}
       </resources>
-    </manifest>`
-  )
+    </manifest>`;
 }
