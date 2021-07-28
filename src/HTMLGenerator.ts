@@ -4,9 +4,8 @@ export interface HTMLGeneratorProps {
 }
 
 export function HTMLGenerator(props: HTMLGeneratorProps) {
-  const { dataSource, libPath = 'lib' } = props
-  return (
-    `<!DOCTYPE html>
+  const { dataSource, libPath = "lib" } = props;
+  return `<!DOCTYPE html>
     <html>
         <head>
             <title>SCO local endpoint</title>
@@ -66,6 +65,5 @@ export function HTMLGenerator(props: HTMLGeneratorProps) {
             </div>
             <div id="runtime-error"></div>
         </body>
-    </html>`
-  )
+    </html>`;
 }

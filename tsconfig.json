@@ -1,26 +1,20 @@
 {
-    "compilerOptions": {
-      "outDir": "./lib",
-      "noImplicitAny": true,
-      "declaration": true,
-      "module": "commonjs",
-      "target": "es5",
-      "lib": [
-        "es2017",
-        "dom"
-      ],
-      "emitDecoratorMetadata": true,
-      "experimentalDecorators": true,
-      "resolveJsonModule": true,
-      "esModuleInterop": true,
-      "isolatedModules": true,
-      "noUnusedLocals": true,
-      "noUnusedParameters": true,
-      "allowJs": true
-    },
-    "include": [
-      "./src/*.ts",
-      "./src/*.js"
-    ],
-    "exclude": ["node_modules"]
-  }
+  "compilerOptions": {
+    "outDir": "./lib",
+    "noImplicitAny": true,
+    "declaration": true,
+    "module": "commonjs",
+    "target": "es5",
+    "lib": ["es2017", "dom"],
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "resolveJsonModule": true,
+    "esModuleInterop": true,
+    "isolatedModules": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "allowJs": true
+  },
+  "include": ["./src/*.ts", "./src/*.js"],
+  "exclude": ["node_modules"]
+}
