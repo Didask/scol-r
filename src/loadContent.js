@@ -148,6 +148,7 @@ function loadContent() {
   new MessageHandler(window, sourceOrigin, ADAPTER);
 
   window.addEventListener("beforeunload", function (e) {
+    ADAPTER.LMSCommit();
     ADAPTER.LMSTerminate();
   });
 }
