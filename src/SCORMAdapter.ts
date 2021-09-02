@@ -155,9 +155,7 @@ export class SCORMAdapter {
     var functionName = "SetValue";
     var result = this._callAPIFunction(functionName, [name, value]);
     var success = eval(result.toString());
-    return success
-      ? this.LMSCommit()
-      : this._handleError(`${functionName}: {${name}: ${value}}`);
+    return success || this._handleError(`${functionName}: {${name}: ${value}}`);
   }
 
   LMSCommit() {
