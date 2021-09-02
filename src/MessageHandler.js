@@ -18,7 +18,7 @@ function MessageHandler(win, sourceOrigin, adapter) {
         this.timeoutId = setTimeout(() => {
           this.commit();
           this.timeoutId = null
-        }, 5000)
+        }, 500)
       }
     }.bind(this)
   );
