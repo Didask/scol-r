@@ -151,12 +151,12 @@ export class SCORMAdapter {
     return success ? value : this._handleError(`${functionName}: ${name}`);
   }
 
-  LMSSetValue(name: string, value: string | number) {
+  LMSSetValue(name: string, value: string | number, hasToCommit: boolean = true) {
     var functionName = "SetValue";
     var result = this._callAPIFunction(functionName, [name, value]);
     var success = eval(result.toString());
-    return success
-      ? this.LMSCommit()
+    return success 
+      ? hasToCommit && this.LMSCommit()
       : this._handleError(`${functionName}: {${name}: ${value}}`);
   }
 
@@ -189,11 +189,11 @@ export class SCORMAdapter {
     return this.LMSGetValue(CMIVariableName);
   }
 
-  setScore(score: number) {
+  setScore(score: number, hasToCommit: boolean = true) {
     var CMIVariableName = this._isSCORM2004
       ? "cmi.score.raw"
       : "cmi.core.score.raw";
-    this.LMSSetValue(CMIVariableName, score);
+    this.LMSSetValue(CMIVariableName, score, hasToCommit);
   }
 
   getScore() {
@@ -211,12 +211,12 @@ export class SCORMAdapter {
     return this.LMSGetValue(CMIVariableName);
   }
 
-  setLessonStatus(lessonStatus: string) {
+  setLessonStatus(lessonStatus: string, hasToCommit: boolean = true) {
     if (this._isSCORM2004) {
       var successStatus = "unknown";
       if (lessonStatus === "passed" || lessonStatus === "failed")
         successStatus = lessonStatus;
-      this.LMSSetValue("cmi.success_status", successStatus);
+      this.LMSSetValue("cmi.success_status", successStatus, hasToCommit);
       var completionStatus = "unknown";
       if (lessonStatus === "passed" || lessonStatus === "completed") {
         completionStatus = "completed";
@@ -228,9 +228,9 @@ export class SCORMAdapter {
       ) {
         completionStatus = "not attempted";
       }
-      this.LMSSetValue("cmi.completion_status", completionStatus);
+      this.LMSSetValue("cmi.completion_status", completionStatus, hasToCommit);
     } else {
-      this.LMSSetValue("cmi.core.lesson_status", lessonStatus);
+      this.LMSSetValue("cmi.core.lesson_status", lessonStatus, hasToCommit);
     }
   }
 
@@ -264,9 +264,9 @@ export class SCORMAdapter {
     return this.LMSGetValue("cmi.objectives._children") !== null;
   }
 
-  setObjectives(objectivesIds: string[]) {
+  setObjectives(objectivesIds: string[], hasToCommit: boolean = true) {
     objectivesIds.forEach((objectiveId, index) => {
-      this.LMSSetValue(`cmi.objectives.${index}.id`, objectiveId);
+      this.LMSSetValue(`cmi.objectives.${index}.id`, objectiveId, hasToCommit);
     });
   }
 
@@ -279,7 +279,7 @@ export class SCORMAdapter {
     return objectives;
   }
 
-  setObjectiveScore(objectiveId: string, score: number) {
+  setObjectiveScore(objectiveId: string, score: number, hasToCommit: boolean = true) {
     const objectivesNbr = this.LMSGetValue("cmi.objectives._count");
     for (let index = 0; index < objectivesNbr; index++) {
       const storedObjectiveId = this.LMSGetValue(`cmi.objectives.${index}.id`);
@@ -289,7 +289,8 @@ export class SCORMAdapter {
           `cmi.objectives.${index}.score.${
             this._isSCORM2004 ? "scaled" : "raw"
           }`,
-          score
+          score,
+          hasToCommit
         );
         return;
       }
