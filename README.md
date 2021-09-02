@@ -11,6 +11,14 @@ To get started:
 The SCORM Adapter intends to be compatible with SCORM versions 1.2 and 2004, hopefully with more to come.
 The version should be specified in the manifest's `schemaversion` metadata attribute.
 
----
+----
+v1.0.0 :
+💣 Breaking changes :
+
+We remove LMSCommit after SetValue, now you have to handle it from your side for offline SCORM.
+
+We put LMSCommit as debounce (500ms) after each setValue
+
+----
 
 Made with ❤️ by [Didask](https://www.didask.com/)

@@ -1,4 +1,5 @@
 function MessageHandler(win, sourceOrigin, adapter) {
+  this.timeoutId = null
   win.addEventListener(
     "message",
     function (e) {
@@ -11,9 +12,20 @@ function MessageHandler(win, sourceOrigin, adapter) {
         typeof this[functionName] === "function"
       ) {
         this[functionName].apply(this, functionArgs);
+        if (this.timeoutId) {
+          clearTimeout(this.timeoutId)
+        }
+        this.timeoutId = setTimeout(() => {
+          this.commit();
+          this.timeoutId = null
+        }, 500)
       }
     }.bind(this)
   );
+
+  this.commit = function () {
+    adapter.LMSCommit()
+  }
 
   this.setTitle = function (title) {
     document.title = title;
