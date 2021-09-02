@@ -151,13 +151,11 @@ export class SCORMAdapter {
     return success ? value : this._handleError(`${functionName}: ${name}`);
   }
 
-  LMSSetValue(name: string, value: string | number, hasToCommit: boolean = true) {
+  LMSSetValue(name: string, value: string | number) {
     var functionName = "SetValue";
     var result = this._callAPIFunction(functionName, [name, value]);
     var success = eval(result.toString());
-    return success 
-      ? hasToCommit && this.LMSCommit()
-      : this._handleError(`${functionName}: {${name}: ${value}}`);
+    return success || this._handleError(`${functionName}: {${name}: ${value}}`);
   }
 
   LMSCommit() {
@@ -189,11 +187,11 @@ export class SCORMAdapter {
     return this.LMSGetValue(CMIVariableName);
   }
 
-  setScore(score: number, hasToCommit: boolean = true) {
+  setScore(score: number) {
     var CMIVariableName = this._isSCORM2004
       ? "cmi.score.raw"
       : "cmi.core.score.raw";
-    this.LMSSetValue(CMIVariableName, score, hasToCommit);
+    this.LMSSetValue(CMIVariableName, score);
   }
 
   getScore() {
@@ -211,12 +209,12 @@ export class SCORMAdapter {
     return this.LMSGetValue(CMIVariableName);
   }
 
-  setLessonStatus(lessonStatus: string, hasToCommit: boolean = true) {
+  setLessonStatus(lessonStatus: string) {
     if (this._isSCORM2004) {
       var successStatus = "unknown";
       if (lessonStatus === "passed" || lessonStatus === "failed")
         successStatus = lessonStatus;
-      this.LMSSetValue("cmi.success_status", successStatus, hasToCommit);
+      this.LMSSetValue("cmi.success_status", successStatus);
       var completionStatus = "unknown";
       if (lessonStatus === "passed" || lessonStatus === "completed") {
         completionStatus = "completed";
@@ -228,9 +226,9 @@ export class SCORMAdapter {
       ) {
         completionStatus = "not attempted";
       }
-      this.LMSSetValue("cmi.completion_status", completionStatus, hasToCommit);
+      this.LMSSetValue("cmi.completion_status", completionStatus);
     } else {
-      this.LMSSetValue("cmi.core.lesson_status", lessonStatus, hasToCommit);
+      this.LMSSetValue("cmi.core.lesson_status", lessonStatus);
     }
   }
 
@@ -264,9 +262,9 @@ export class SCORMAdapter {
     return this.LMSGetValue("cmi.objectives._children") !== null;
   }
 
-  setObjectives(objectivesIds: string[], hasToCommit: boolean = true) {
+  setObjectives(objectivesIds: string[]) {
     objectivesIds.forEach((objectiveId, index) => {
-      this.LMSSetValue(`cmi.objectives.${index}.id`, objectiveId, hasToCommit);
+      this.LMSSetValue(`cmi.objectives.${index}.id`, objectiveId);
     });
   }
 
@@ -279,7 +277,7 @@ export class SCORMAdapter {
     return objectives;
   }
 
-  setObjectiveScore(objectiveId: string, score: number, hasToCommit: boolean = true) {
+  setObjectiveScore(objectiveId: string, score: number) {
     const objectivesNbr = this.LMSGetValue("cmi.objectives._count");
     for (let index = 0; index < objectivesNbr; index++) {
       const storedObjectiveId = this.LMSGetValue(`cmi.objectives.${index}.id`);
@@ -289,8 +287,7 @@ export class SCORMAdapter {
           `cmi.objectives.${index}.score.${
             this._isSCORM2004 ? "scaled" : "raw"
           }`,
-          score,
-          hasToCommit
+          score
         );
         return;
       }
