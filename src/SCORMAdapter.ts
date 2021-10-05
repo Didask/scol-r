@@ -268,7 +268,7 @@ export class SCORMAdapter {
     });
   }
 
-  getObjectives() {
+  get objectives() {
     const objectives = [];
     const objectivesNbr = this.LMSGetValue("cmi.objectives._count");
     for (let index = 0; index < objectivesNbr; index++) {
