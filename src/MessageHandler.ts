@@ -1,10 +1,8 @@
-import { LessonStatus, SCORMAdapter } from ".";
-
 export class MessageReceiver {
   private timeoutId: number;
-  private adapter: SCORMAdapter;
+  private adapter: any;
 
-  constructor(win: Window, sourceOrigin: string, adapter: SCORMAdapter) {
+  constructor(win: Window, sourceOrigin: string, adapter: any) {
     this.adapter = adapter;
 
     const handler = (e: MessageEvent) => {
@@ -46,7 +44,7 @@ export class MessageReceiver {
     this.adapter.setScore(score);
   }
 
-  setLessonStatus(lessonStatus: LessonStatus) {
+  setLessonStatus(lessonStatus: string) {
     this.adapter.setLessonStatus(lessonStatus);
   }
 
@@ -85,7 +83,7 @@ export class MessageEmitter {
     );
   }
 
-  setLessonStatus(status: LessonStatus): void {
+  setLessonStatus(status: string): void {
     this.sendMessage("setLessonStatus", [status]);
   }
 
