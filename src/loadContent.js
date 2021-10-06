@@ -145,7 +145,7 @@ function loadContent() {
     host = host.slice(0, host.indexOf(":"));
   }
   var sourceOrigin = sourceUrlParser.protocol + "//" + host;
-  new MessageHandler(window, sourceOrigin, ADAPTER);
+  new MessageReceiver(window, sourceOrigin, ADAPTER);
 
   window.addEventListener("beforeunload", function (e) {
     ADAPTER.LMSTerminate();

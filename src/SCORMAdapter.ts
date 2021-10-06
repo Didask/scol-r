@@ -1,3 +1,5 @@
+import { LessonStatus } from ".";
+
 interface ApiWindow extends Window {
   API?: any;
   API_1484_11?: any;
@@ -209,20 +211,26 @@ export class SCORMAdapter {
     return this.LMSGetValue(CMIVariableName);
   }
 
-  setLessonStatus(lessonStatus: string) {
+  setLessonStatus(lessonStatus: LessonStatus) {
     if (this._isSCORM2004) {
       var successStatus = "unknown";
-      if (lessonStatus === "passed" || lessonStatus === "failed")
+      if (
+        lessonStatus === LessonStatus.Passed ||
+        lessonStatus === LessonStatus.Failed
+      )
         successStatus = lessonStatus;
       this.LMSSetValue("cmi.success_status", successStatus);
       var completionStatus = "unknown";
-      if (lessonStatus === "passed" || lessonStatus === "completed") {
+      if (
+        lessonStatus === LessonStatus.Passed ||
+        lessonStatus === LessonStatus.Completed
+      ) {
         completionStatus = "completed";
-      } else if (lessonStatus === "incomplete") {
+      } else if (lessonStatus === LessonStatus.Incomplete) {
         completionStatus = "incomplete";
       } else if (
-        lessonStatus === "not attempted" ||
-        lessonStatus === "browsed"
+        lessonStatus === LessonStatus.NotAttempted ||
+        lessonStatus === LessonStatus.Browsed
       ) {
         completionStatus = "not attempted";
       }
