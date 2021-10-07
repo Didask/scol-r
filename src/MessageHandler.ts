@@ -1,72 +1,73 @@
-export class MessageReceiver {
-  private timeoutId: number;
-  private adapter: any;
-
-  constructor(win: Window, sourceOrigin: string, adapter: any) {
-    this.adapter = adapter;
-
-    const handler = (e: MessageEvent) => {
+export function MessageReceiver(
+  win: Window,
+  sourceOrigin: string,
+  adapter: any
+) {
+  this.timeoutId = null;
+  win.addEventListener(
+    "message",
+    function (e: MessageEvent) {
       if (e.origin !== sourceOrigin) return;
       var functionName = e.data["function"];
       var functionArgs = e.data["arguments"];
-      typeof this["adapter"] === "function";
-      if (functionName && Array.isArray(functionArgs)) {
-        const func = Object.entries(this).reduce((acc, [key, value]) => {
-          if (key === functionName && typeof value === "function") return value;
-          return acc;
-        }, undefined);
-
-        if (func) {
-          func(...functionArgs);
-          if (this.timeoutId) {
-            clearTimeout(this.timeoutId);
-          }
-          this.timeoutId = setTimeout(() => {
-            this.commit();
-            this.timeoutId = null;
-          }, 500);
+      if (
+        functionName &&
+        functionArgs &&
+        typeof this[functionName] === "function"
+      ) {
+        this[functionName].apply(this, functionArgs);
+        if (this.timeoutId) {
+          clearTimeout(this.timeoutId);
         }
+        this.timeoutId = setTimeout(() => {
+          this.commit();
+          this.timeoutId = null;
+        }, 500);
       }
-    };
+    }.bind(this)
+  );
 
-    win.addEventListener("message", handler);
-  }
+  this.commit = function () {
+    adapter.LMSCommit();
+  };
 
-  commit() {
-    this.adapter.LMSCommit();
-  }
-
-  setTitle(title: string) {
+  this.setTitle = function (title: string) {
     document.title = title;
-  }
+  };
 
-  setScore(score: number) {
-    this.adapter.setScore(score);
-  }
+  this.setScore = function (score: string) {
+    adapter.setScore(score);
+  };
 
-  setLessonStatus(lessonStatus: string) {
-    this.adapter.setLessonStatus(lessonStatus);
-  }
+  this.setLessonStatus = function (lessonStatus: string) {
+    adapter.setLessonStatus(lessonStatus);
+  };
 
-  setObjectives(objectivesIds: string[]) {
-    if (this.adapter.objectivesAreAvailable) {
-      this.adapter.setObjectives(objectivesIds);
+  this.setObjectives = function (objectivesIds: string[]) {
+    if (adapter.objectivesAreAvailable) {
+      adapter.setObjectives(objectivesIds);
     }
-  }
+  };
 
-  setObjectiveScore(objectiveId: string, score: number) {
-    if (this.adapter.objectivesAreAvailable) {
-      this.adapter.setObjectiveScore(objectiveId, score);
+  this.setObjectiveScore = function (objectiveId: string, score: number) {
+    if (adapter.objectivesAreAvailable) {
+      adapter.setObjectiveScore(objectiveId, score);
     }
-  }
+  };
+
+  this.setObjectiveStatus = function (objectiveId: string, status: string) {
+    if (adapter.objectivesAreAvailable) {
+      adapter.setObjectiveStatus(objectiveId, status);
+    }
+  };
 }
 
 export class MessageEmitter {
   private currentWindow: Window;
   private lmsOrigin: string;
 
-  constructor(currentWindow: Window, lmsOrigin: string) {
-    this.currentWindow = currentWindow;
+  constructor(lmsOrigin: string) {
+    this.currentWindow = window.parent || window.opener;
     this.lmsOrigin = lmsOrigin;
   }
 
@@ -86,14 +87,19 @@ export class MessageEmitter {
   setLessonStatus(status: string): void {
     this.sendMessage("setLessonStatus", [status]);
   }
-
-  setObjectiveScore(objectiveId: string, score: number): void {
-    this.sendMessage("setObjectiveScore", [objectiveId, score]);
-  }
   setScore(score: number): void {
     this.sendMessage("setScore", [score]);
   }
   setObjectives(objectives: string[]): void {
     this.sendMessage("setObjectives", [objectives]);
+  }
+  setObjectiveScore(objectiveId: string, score: number): void {
+    this.sendMessage("setObjectiveScore", [objectiveId, score]);
+  }
+  setObjectiveStatus(
+    objectiveId: string,
+    status: "completed" | "incomplete"
+  ): void {
+    this.sendMessage("setObjectiveStatus", [objectiveId, status]);
   }
 }
