@@ -181,32 +181,32 @@ export class SCORMAdapter {
   }
 
   getLearnerId() {
-    const CMIvariableName = this._isSCORM2004
+    const CMIVariableName = this._isSCORM2004
       ? "cmi.learner_id"
       : "cmi.core.student_id";
-    return this.LMSGetValue(CMIvariableName);
+    return this.LMSGetValue(CMIVariableName);
   }
 
   setScore(score: number) {
-    const CMIvariableName = this._isSCORM2004
+    const CMIVariableName = this._isSCORM2004
       ? "cmi.score.raw"
       : "cmi.core.score.raw";
-    this.LMSSetValue(CMIvariableName, score);
+    this.LMSSetValue(CMIVariableName, score);
   }
 
   getScore() {
-    const CMIvariableName = this._isSCORM2004
+    const CMIVariableName = this._isSCORM2004
       ? "cmi.score.raw"
       : "cmi.core.score.raw";
-    let score = this.LMSGetValue(CMIvariableName);
+    let score = this.LMSGetValue(CMIVariableName);
     return score;
   }
 
   getLessonStatus() {
-    const CMIvariableName = this._isSCORM2004
+    const CMIVariableName = this._isSCORM2004
       ? "cmi.completion_status"
       : "cmi.core.lesson_status";
-    return this.LMSGetValue(CMIvariableName);
+    return this.LMSGetValue(CMIVariableName);
   }
 
   setLessonStatus(lessonStatus: string) {
@@ -233,7 +233,7 @@ export class SCORMAdapter {
   }
 
   setSessionTime(msSessionTime: number) {
-    const CMIvariableName = this._isSCORM2004
+    const CMIVariableName = this._isSCORM2004
       ? "cmi.session_time"
       : "cmi.core.session_time";
     let duration;
@@ -255,7 +255,7 @@ export class SCORMAdapter {
         formattedHours + ":" + formattedMinutes + ":" + formattedSeconds;
     }
 
-    this.LMSSetValue(CMIvariableName, duration);
+    this.LMSSetValue(CMIVariableName, duration);
   }
 
   get objectivesAreAvailable() {
