@@ -53,7 +53,7 @@ export class SCORMAdapter {
   }
 
   private _findAPIInWindow(win: ApiWindow) {
-    var findAPITries = 0;
+    let findAPITries = 0;
     while (
       win.API == null &&
       win.API_1484_11 == null &&
@@ -100,9 +100,9 @@ export class SCORMAdapter {
   }
 
   private _handleError(functionName: string) {
-    var lastErrorCode = this.LMSGetLastError();
-    var lastErrorString = this.LMSGetErrorString(lastErrorCode);
-    var lastErrorDiagnostic = this.LMSGetDiagnostic(lastErrorCode);
+    const lastErrorCode = this.LMSGetLastError();
+    const lastErrorString = this.LMSGetErrorString(lastErrorCode);
+    const lastErrorDiagnostic = this.LMSGetDiagnostic(lastErrorCode);
     if (!this._ignorableErrorCodes.some(({ code }) => code === lastErrorCode)) {
       console.warn(
         functionName,
@@ -126,10 +126,10 @@ export class SCORMAdapter {
   }
 
   LMSInitialize() {
-    var functionName = "Initialize";
-    var result = this._callAPIFunction(functionName);
-    var lastErrorCode = this.LMSGetLastError();
-    var success =
+    const functionName = "Initialize";
+    const result = this._callAPIFunction(functionName);
+    const lastErrorCode = this.LMSGetLastError();
+    const success =
       eval(result.toString()) ||
       (this._isSCORM2004
         ? lastErrorCode === 103 // 103 in 2004.* = already initialized
@@ -138,29 +138,29 @@ export class SCORMAdapter {
   }
 
   LMSTerminate() {
-    var functionName = this._isSCORM2004 ? "Terminate" : "Finish";
-    var result = this._callAPIFunction(functionName);
-    var success = eval(result.toString());
+    const functionName = this._isSCORM2004 ? "Terminate" : "Finish";
+    const result = this._callAPIFunction(functionName);
+    const success = eval(result.toString());
     return success || this._handleError(functionName);
   }
 
   LMSGetValue(name: string) {
-    var functionName = "GetValue";
-    var value = this._callAPIFunction(functionName, [name]);
-    var success = this.LMSGetLastError() === 0;
+    const functionName = "GetValue";
+    const value = this._callAPIFunction(functionName, [name]);
+    const success = this.LMSGetLastError() === 0;
     return success ? value : this._handleError(`${functionName}: ${name}`);
   }
 
   LMSSetValue(name: string, value: string | number) {
-    var functionName = "SetValue";
-    var result = this._callAPIFunction(functionName, [name, value]);
-    var success = eval(result.toString());
+    const functionName = "SetValue";
+    const result = this._callAPIFunction(functionName, [name, value]);
+    const success = eval(result.toString());
     return success || this._handleError(`${functionName}: {${name}: ${value}}`);
   }
 
   LMSCommit() {
-    var result = this._callAPIFunction("Commit");
-    var success = eval(result.toString());
+    const result = this._callAPIFunction("Commit");
+    const success = eval(result.toString());
     return success || this._errorCallback("commitFailed");
   }
 
@@ -181,21 +181,21 @@ export class SCORMAdapter {
   }
 
   getLearnerId() {
-    var CMIVariableName = this._isSCORM2004
+    const CMIVariableName = this._isSCORM2004
       ? "cmi.learner_id"
       : "cmi.core.student_id";
     return this.LMSGetValue(CMIVariableName);
   }
 
   setScore(score: number) {
-    var CMIVariableName = this._isSCORM2004
+    const CMIVariableName = this._isSCORM2004
       ? "cmi.score.raw"
       : "cmi.core.score.raw";
     this.LMSSetValue(CMIVariableName, score);
   }
 
   getScore() {
-    var CMIVariableName = this._isSCORM2004
+    const CMIVariableName = this._isSCORM2004
       ? "cmi.score.raw"
       : "cmi.core.score.raw";
     let score = this.LMSGetValue(CMIVariableName);
@@ -203,7 +203,7 @@ export class SCORMAdapter {
   }
 
   getLessonStatus() {
-    var CMIVariableName = this._isSCORM2004
+    const CMIVariableName = this._isSCORM2004
       ? "cmi.completion_status"
       : "cmi.core.lesson_status";
     return this.LMSGetValue(CMIVariableName);
@@ -211,11 +211,11 @@ export class SCORMAdapter {
 
   setLessonStatus(lessonStatus: string) {
     if (this._isSCORM2004) {
-      var successStatus = "unknown";
+      let successStatus = "unknown";
       if (lessonStatus === "passed" || lessonStatus === "failed")
         successStatus = lessonStatus;
       this.LMSSetValue("cmi.success_status", successStatus);
-      var completionStatus = "unknown";
+      let completionStatus = "unknown";
       if (lessonStatus === "passed" || lessonStatus === "completed") {
         completionStatus = "completed";
       } else if (lessonStatus === "incomplete") {
@@ -233,19 +233,19 @@ export class SCORMAdapter {
   }
 
   setSessionTime(msSessionTime: number) {
-    var CMIVariableName = this._isSCORM2004
-        ? "cmi.session_time"
-        : "cmi.core.session_time",
-      duration;
+    const CMIVariableName = this._isSCORM2004
+      ? "cmi.session_time"
+      : "cmi.core.session_time";
+    let duration;
 
     if (this._isSCORM2004) {
       duration = Math.round(msSessionTime / 1000);
     } else {
-      var hours = Math.floor(msSessionTime / 1000 / 60 / 60);
+      const hours = Math.floor(msSessionTime / 1000 / 60 / 60);
       msSessionTime -= hours * 1000 * 60 * 60;
-      var minutes = Math.floor(msSessionTime / 1000 / 60);
+      const minutes = Math.floor(msSessionTime / 1000 / 60);
       msSessionTime -= minutes * 1000 * 60;
-      var seconds = Math.floor(msSessionTime / 1000);
+      const seconds = Math.floor(msSessionTime / 1000);
 
       const formattedSeconds = seconds < 10 ? "0" + seconds : seconds;
       const formattedMinutes = minutes < 10 ? "0" + minutes : minutes;
@@ -268,7 +268,7 @@ export class SCORMAdapter {
     });
   }
 
-  getObjectives() {
+  get objectives() {
     const objectives = [];
     const objectivesNbr = this.LMSGetValue("cmi.objectives._count");
     for (let index = 0; index < objectivesNbr; index++) {
@@ -282,13 +282,32 @@ export class SCORMAdapter {
     for (let index = 0; index < objectivesNbr; index++) {
       const storedObjectiveId = this.LMSGetValue(`cmi.objectives.${index}.id`);
       if (objectiveId === storedObjectiveId) {
-        if (this._isSCORM2004) score = score / 100;
-        this.LMSSetValue(
-          `cmi.objectives.${index}.score.${
-            this._isSCORM2004 ? "scaled" : "raw"
-          }`,
-          score
-        );
+        this.LMSSetValue(`cmi.objectives.${index}.score.raw`, score);
+        return;
+      }
+    }
+  }
+
+  setObjectiveStatus(objectiveId: string, status: "completed" | "incomplete") {
+    const objectivesNbr = this.LMSGetValue("cmi.objectives._count");
+    for (let index = 0; index < objectivesNbr; index++) {
+      const storedObjectiveId = this.LMSGetValue(`cmi.objectives.${index}.id`);
+      if (objectiveId === storedObjectiveId) {
+        if (this._isSCORM2004) {
+          this.LMSSetValue(
+            `cmi.objectives.${index}.success_status`,
+            status === "completed" ? "passed" : "unknown"
+          );
+          this.LMSSetValue(
+            `cmi.objectives.${index}.completion_status`,
+            status === "completed" ? "completed" : "incomplete"
+          );
+        } else {
+          this.LMSSetValue(
+            `cmi.objectives.${index}.status`,
+            status === "completed" ? "passed" : "incomplete"
+          );
+        }
         return;
       }
     }
@@ -299,13 +318,7 @@ export class SCORMAdapter {
     for (let index = 0; index < objectivesNbr; index++) {
       const storedObjectiveId = this.LMSGetValue(`cmi.objectives.${index}.id`);
       if (objectiveId === storedObjectiveId) {
-        let score = this.LMSGetValue(
-          `cmi.objectives.${index}.score.${
-            this._isSCORM2004 ? "scaled" : "raw"
-          }`
-        );
-        if (this._isSCORM2004) score = score * 100;
-        return score;
+        return this.LMSGetValue(`cmi.objectives.${index}.score.raw`);
       }
     }
   }
