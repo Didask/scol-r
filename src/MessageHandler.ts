@@ -8,8 +8,8 @@ export function MessageReceiver(
     "message",
     function (e: MessageEvent) {
       if (e.origin !== sourceOrigin) return;
-      var functionName = e.data["function"];
-      var functionArgs = e.data["arguments"];
+      const functionName = e.data["function"];
+      const functionArgs = e.data["arguments"];
       if (
         functionName &&
         functionArgs &&
