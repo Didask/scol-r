@@ -68,9 +68,11 @@ function loadContent() {
     messagesContainer.length && messagesContainer[0].appendChild(newMessage);
   };
 
-  var captureSentryException = function (...args) {
+  var captureSentryException = function (args) {
     if ("Sentry" in window) {
-      Sentry.captureException(new Error(args.join(" -- ")));
+      Sentry.captureException(
+        new Error(args.filter((arg) => !!arg).join(" -- "))
+      );
     }
   };
 
@@ -88,6 +90,7 @@ function loadContent() {
       thisError.innerHTML = localizeMessage(arguments[i]);
       errorContainer.appendChild(thisError);
     }
+    captureSentryException(arguments);
     // Remove the messages after 6 seconds
     setTimeout(function () {
       errorContainer.innerHTML = "";
