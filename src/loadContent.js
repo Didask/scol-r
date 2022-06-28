@@ -71,7 +71,9 @@ function loadContent() {
   var captureSentryException = function (args) {
     if ("Sentry" in window) {
       Sentry.captureException(
-        new Error(args.filter((arg) => !!arg).join(" -- "))
+        new Error(
+          args.reduce((acc, arg) => (arg ? `${acc} -- ${arg}` : acc), "")
+        )
       );
     }
   };
