@@ -1,16 +1,36 @@
 export interface HTMLGeneratorProps {
   dataSource: string;
   libPath?: string;
+  sentry?: {
+    dsn: string;
+    tags?: Record<string, string>;
+  };
 }
 
 export function HTMLGenerator(props: HTMLGeneratorProps) {
-  const { dataSource, libPath = "lib" } = props;
+  const {
+    dataSource,
+    libPath = "lib",
+    sentry: { dsn, tags },
+  } = props;
   return `<!DOCTYPE html>
     <html>
         <head>
             <title>SCO local endpoint</title>
             <meta charset="UTF-8"/>
             <script>var exports = {};</script>
+            ${
+              dsn &&
+              `<script
+                src="https://browser.sentry-cdn.com/7.3.1/bundle.min.js"
+                integrity="sha384-07qUw81m8MXGTEXf9FQODO4Vop82t3F03SS3v3EOfrf8j7bOb/oJNg6inMDKFk2I"
+                crossorigin="anonymous"
+            ></script>
+            <script>Sentry.init(${JSON.stringify({
+              dsn,
+              ...(tags && { initialScope: { tags } }),
+            })});</script>`
+            }
             <script type="text/javascript" src="${libPath}/SCORMAdapter.js"></script>
             <script type="text/javascript" src="${libPath}/MessageHandler.js"></script>
             <script type="text/javascript" src="${libPath}/loadContent.js"></script>

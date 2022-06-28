@@ -68,6 +68,12 @@ function loadContent() {
     messagesContainer.length && messagesContainer[0].appendChild(newMessage);
   };
 
+  var captureSentryException = function (...args) {
+    if ("Sentry" in window) {
+      Sentry.captureException(new Error(args.join(" -- ")));
+    }
+  };
+
   var displayRuntimeError = function () {
     var errorContainer = document.getElementById("runtime-error");
     if (!(arguments && arguments.length)) {
