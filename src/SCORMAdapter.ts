@@ -188,10 +188,12 @@ export class SCORMAdapter {
   }
 
   setScore(score: number) {
-    const CMIVariableName = this._isSCORM2004
-      ? "cmi.score.raw"
-      : "cmi.core.score.raw";
-    this.LMSSetValue(CMIVariableName, score);
+    if (this._isSCORM2004) {
+      this.LMSSetValue("cmi.score.raw", score);
+      this.LMSSetValue("cmi.score.scaled", score / 100);
+    } else {
+      this.LMSSetValue("cmi.core.score.raw", score);
+    }
   }
 
   getScore() {
