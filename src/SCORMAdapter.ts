@@ -17,9 +17,6 @@ export class SCORMAdapter {
     this._isSCORM2004 = false;
     this._errorCallback = errorCallback;
     this._findAndSetAPI();
-    if (this._API) {
-      this._initialize();
-    }
   }
 
   get foundAPI() {
@@ -147,6 +144,10 @@ export class SCORMAdapter {
       (this._isSCORM2004
         ? lastErrorCode === 103 // 103 in 2004.* = already initialized
         : lastErrorCode === 101); // 101 in 1.2 = already initialized
+
+    if (success) {
+      this._initialize();
+    }
     return success || this._handleError(functionName);
   }
 
