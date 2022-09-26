@@ -17,10 +17,23 @@ export class SCORMAdapter {
     this._isSCORM2004 = false;
     this._errorCallback = errorCallback;
     this._findAndSetAPI();
+    if (this._API) {
+      this._initialize();
+    }
   }
 
   get foundAPI() {
     return !!this._API;
+  }
+
+  private _initialize() {
+    if (this._isSCORM2004) {
+      this.LMSSetValue("cmi.score.min", 0);
+      this.LMSSetValue("cmi.score.max", 100);
+    } else {
+      this.LMSSetValue("cmi.core.score.min", 0);
+      this.LMSSetValue("cmi.core.score.max", 100);
+    }
   }
 
   private _findAndSetAPI() {
