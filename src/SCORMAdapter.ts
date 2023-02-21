@@ -10,36 +10,28 @@ export class SCORMAdapter {
   private _lastRequest: { method: "get" | "set"; key: string } | null;
   private _ignorableErrorCodes: {
     code: number;
-    shouldBeIgnored: boolean;
+    getShouldBeIgnored: () => boolean;
   }[] = [
-    { code: 0, shouldBeIgnored: true },
+    { code: 0, getShouldBeIgnored: () => true },
     {
       code: 403,
-      get shouldBeIgnored() {
-        return this._isSCORM2004;
-      },
+      getShouldBeIgnored: () => this._isSCORM2004,
     },
     {
       code: 401,
-      get shouldBeIgnored() {
-        return (
-          !this._isSCORM2004 &&
-          this._lastRequest &&
-          this._lastRequest.method === "get" &&
-          this._lastRequest.key === "cmi.objectives._children"
-        );
-      },
+      getShouldBeIgnored: () =>
+        !this._isSCORM2004 &&
+        this._lastRequest &&
+        this._lastRequest.method === "get" &&
+        this._lastRequest.key === "cmi.objectives._children",
     },
     {
       code: 402,
-      get shouldBeIgnored() {
-        return (
-          this._isSCORM2004 &&
-          this._lastRequest &&
-          this._lastRequest.method === "get" &&
-          this._lastRequest.key === "cmi.objectives._children"
-        );
-      },
+      getShouldBeIgnored: () =>
+        this._isSCORM2004 &&
+        this._lastRequest &&
+        this._lastRequest.method === "get" &&
+        this._lastRequest.key === "cmi.objectives._children",
     },
   ];
 
@@ -143,7 +135,8 @@ export class SCORMAdapter {
     const lastErrorDiagnostic = this.LMSGetDiagnostic(lastErrorCode);
     if (
       !this._ignorableErrorCodes.some(
-        ({ code, shouldBeIgnored }) => code === lastErrorCode && shouldBeIgnored
+        ({ code, getShouldBeIgnored }) =>
+          code === lastErrorCode && getShouldBeIgnored()
       )
     ) {
       console.warn(
