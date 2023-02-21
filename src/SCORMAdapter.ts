@@ -275,7 +275,8 @@ export class SCORMAdapter {
   }
 
   get objectivesAreAvailable() {
-    return this.LMSGetValue("cmi.objectives._children") !== null;
+    const objectivesFields = !!this.LMSGetValue("cmi.objectives._children");
+    return objectivesFields && this.LMSGetLastError() === 0;
   }
 
   setObjectives(objectivesIds: string[]) {
