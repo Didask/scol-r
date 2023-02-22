@@ -7,15 +7,39 @@ export class SCORMAdapter {
   private _API: any;
   private _isSCORM2004: boolean;
   private _errorCallback: Function;
-  private _ignorableErrorCodes: { code: number; scope?: "1.2" | "2004" }[] = [
-    { code: 0 },
-    { code: 403, scope: "2004" },
+  private _lastRequest: { method: "get" | "set"; key: string } | null;
+  private _ignorableErrorCodes: {
+    code: number;
+    getShouldBeIgnored: () => boolean;
+  }[] = [
+    { code: 0, getShouldBeIgnored: () => true },
+    {
+      code: 403,
+      getShouldBeIgnored: () => this._isSCORM2004,
+    },
+    {
+      code: 401,
+      getShouldBeIgnored: () =>
+        !this._isSCORM2004 &&
+        this._lastRequest &&
+        this._lastRequest.method === "get" &&
+        this._lastRequest.key === "cmi.objectives._children",
+    },
+    {
+      code: 402,
+      getShouldBeIgnored: () =>
+        this._isSCORM2004 &&
+        this._lastRequest &&
+        this._lastRequest.method === "get" &&
+        this._lastRequest.key === "cmi.objectives._children",
+    },
   ];
 
   constructor(errorCallback: Function = function () {}) {
     this._API = null;
     this._isSCORM2004 = false;
     this._errorCallback = errorCallback;
+    this._lastRequest = null;
     this._findAndSetAPI();
   }
 
@@ -50,10 +74,6 @@ export class SCORMAdapter {
       } else {
         this._API = theAPI["API"];
         this._isSCORM2004 = theAPI["isSCORM2004"];
-        this._ignorableErrorCodes = this._ignorableErrorCodes.filter(
-          ({ scope }) =>
-            !scope || (this._isSCORM2004 ? scope === "2004" : scope === "1.2")
-        );
       }
 
       if (this._API == null) {
@@ -113,7 +133,12 @@ export class SCORMAdapter {
     const lastErrorCode = this.LMSGetLastError();
     const lastErrorString = this.LMSGetErrorString(lastErrorCode);
     const lastErrorDiagnostic = this.LMSGetDiagnostic(lastErrorCode);
-    if (!this._ignorableErrorCodes.some(({ code }) => code === lastErrorCode)) {
+    if (
+      !this._ignorableErrorCodes.some(
+        ({ code, getShouldBeIgnored }) =>
+          code === lastErrorCode && getShouldBeIgnored()
+      )
+    ) {
       console.warn(
         functionName,
         `An error occured on the SCORM API: code ${lastErrorCode}, message: ${lastErrorString}`,
@@ -159,6 +184,7 @@ export class SCORMAdapter {
   }
 
   LMSGetValue(name: string) {
+    this._lastRequest = { method: "get", key: name };
     const functionName = "GetValue";
     const value = this._callAPIFunction(functionName, [name]);
     const success = this.LMSGetLastError() === 0;
@@ -166,6 +192,7 @@ export class SCORMAdapter {
   }
 
   LMSSetValue(name: string, value: string | number) {
+    this._lastRequest = { method: "set", key: name };
     const functionName = "SetValue";
     const result = this._callAPIFunction(functionName, [name, value]);
     const success = eval(result.toString());
@@ -188,6 +215,10 @@ export class SCORMAdapter {
 
   LMSGetDiagnostic(errorCode: number) {
     return this._callAPIFunction("GetDiagnostic", [errorCode]);
+  }
+
+  get lastRequest() {
+    return this._lastRequest;
   }
 
   getDataFromLMS() {
@@ -275,7 +306,8 @@ export class SCORMAdapter {
   }
 
   get objectivesAreAvailable() {
-    return this.LMSGetValue("cmi.objectives._children") !== null;
+    const objectivesFields = !!this.LMSGetValue("cmi.objectives._children");
+    return objectivesFields && this.LMSGetLastError() === 0;
   }
 
   setObjectives(objectivesIds: string[]) {
