@@ -147,7 +147,13 @@ function loadContent() {
   var sourceOrigin = sourceUrlParser.protocol + "//" + host;
   new MessageReceiver(window, sourceOrigin, ADAPTER);
 
+
+  var sessionStart = new Date().getTime();
+
   window.addEventListener("beforeunload", function (e) {
+    var sessionEnd = new Date().getTime();
+    ADAPTER.setSessionTime(sessionEnd - sessionStart);
+
     ADAPTER.LMSTerminate();
   });
 }

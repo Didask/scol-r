@@ -280,29 +280,13 @@ export class SCORMAdapter {
   }
 
   setSessionTime(msSessionTime: number) {
-    const CMIVariableName = this._isSCORM2004
-      ? "cmi.session_time"
-      : "cmi.core.session_time";
-    let duration;
-
     if (this._isSCORM2004) {
-      duration = Math.round(msSessionTime / 1000);
+      const duration = convertToTimeInterval(msSessionTime);
+      this.LMSSetValue("cmi.session_time", duration);
     } else {
-      const hours = Math.floor(msSessionTime / 1000 / 60 / 60);
-      msSessionTime -= hours * 1000 * 60 * 60;
-      const minutes = Math.floor(msSessionTime / 1000 / 60);
-      msSessionTime -= minutes * 1000 * 60;
-      const seconds = Math.floor(msSessionTime / 1000);
-
-      const formattedSeconds = seconds < 10 ? "0" + seconds : seconds;
-      const formattedMinutes = minutes < 10 ? "0" + minutes : minutes;
-      const formattedHours = hours < 10 ? "0" + hours : hours;
-
-      duration =
-        formattedHours + ":" + formattedMinutes + ":" + formattedSeconds;
+      const duration = convertMsToCMITimespan(msSessionTime);
+      this.LMSSetValue("cmi.core.session_time", duration);
     }
-
-    this.LMSSetValue(CMIVariableName, duration);
   }
 
   get objectivesAreAvailable() {
@@ -377,4 +361,43 @@ export class SCORMAdapter {
   get suspendData() {
     return this.LMSGetValue("cmi.suspend_data");
   }
+}
+
+// timeinterval (second,10,2),
+const convertToTimeInterval = (milliseconds: number) => {
+  const data = getDurationData(milliseconds)
+  const days = data.days
+  const hours = data.hours % 24
+  const minutes = data.minutes % 60
+  const seconds = data.seconds % 60
+  const cents  = data.cents % 100
+
+  const daysString = days ? days + 'D' : '';
+  const hoursString = hours ? hours + 'H' : '';
+  const minutesString = minutes ? minutes + 'M' : '';
+  const secondsString = seconds || '0' + (cents ? '.' + cents : '') + 'S';
+
+  const hms = [ hoursString, minutesString, secondsString ].join('');
+  return 'P' + daysString + 'T' + hms;
+}
+
+const convertMsToCMITimespan = (milliseconds: number) => {
+  const { seconds, minutes, hours } = getDurationData(milliseconds)
+  return `${hours}:${minutes % 60}:${seconds % 60}`
+}
+
+
+const getDurationData = (milliseconds: number): {
+  days: number
+  hours: number
+  minutes: number
+  seconds: number
+  cents: number
+} => {
+  const cents = Math.floor(milliseconds / 10)
+  const seconds = Math.floor(milliseconds / 1000)
+  const minutes = Math.floor(seconds / 60)
+  const hours = Math.floor(minutes / 60)
+  const days = Math.floor(hours / 24)
+  return { days, hours, minutes, seconds, cents }
 }
