@@ -33,6 +33,13 @@ export class SCORMAdapter {
         this._lastRequest.method === "get" &&
         this._lastRequest.key === "cmi.objectives._children",
     },
+    {
+      code: 351,
+      getShouldBeIgnored: () =>
+        this._lastRequest.method === "set" &&
+        new RegExp("^cmi.objectives.\\d+.id$").test(this._lastRequest.key) &&
+        !!this.LMSGetValue(this._lastRequest.key),
+    },
   ];
 
   constructor(errorCallback: Function = function () {}) {
