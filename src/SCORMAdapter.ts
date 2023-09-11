@@ -239,6 +239,23 @@ export class SCORMAdapter {
     return this.LMSGetValue(CMIVariableName);
   }
 
+  getLearnerName() {
+    const CMIVariableName = this._isSCORM2004
+     ? "cmi.learner_name"
+     : "cmi.core.student_name";
+    return this.LMSGetValue(CMIVariableName);
+  }
+
+  setStudent(studentId: string, studentName: string) {
+    if (this._isSCORM2004) {
+      this.LMSSetValue("cmi.learner_id", studentId);
+      this.LMSSetValue("cmi.learner_name", studentName);
+    } else {
+      this.LMSSetValue("cmi.core.student_id", studentId);
+      this.LMSSetValue("cmi.core.student_name", studentName);
+    } 
+  }
+
   setScore(score: number) {
     if (this._isSCORM2004) {
       this.LMSSetValue("cmi.score.raw", score);

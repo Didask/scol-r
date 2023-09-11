@@ -39,6 +39,10 @@ export function MessageReceiver(
     adapter.setScore(score);
   };
 
+  this.setStudent = function (studentId: string, studentName: string) {
+    adapter.setStudent(studentId, studentName);
+  };
+
   this.setLessonStatus = function (lessonStatus: string) {
     adapter.setLessonStatus(lessonStatus);
   };
@@ -84,6 +88,9 @@ export class MessageEmitter {
     );
   }
 
+  setStudent({ id, name }: { id: string; name: string }): void {
+    this.sendMessage("setStudent", [id, name]);
+  }
   setLessonStatus(status: string): void {
     this.sendMessage("setLessonStatus", [status]);
   }
