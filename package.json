@@ -1,6 +1,6 @@
 {
   "name": "@didask/scol-r",
-  "version": "2.2.6",
+  "version": "2.2.7",
   "description": "Shareable Cross-Origin Learning Resources",
   "main": "index.html",
   "types": "lib/index.d.ts",
