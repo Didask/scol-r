@@ -387,8 +387,8 @@ export class SCORMAdapter {
   }
 }
 
+export const convertToTimeInterval = (milliseconds: number) => {
 // timeinterval (second,10,2),
-const convertToTimeInterval = (milliseconds: number) => {
   const data = getDurationData(milliseconds)
   const days = data.days
   const hours = data.hours % 24
@@ -405,9 +405,14 @@ const convertToTimeInterval = (milliseconds: number) => {
   return 'P' + daysString + 'T' + hms;
 }
 
-const convertMsToCMITimespan = (milliseconds: number) => {
-  const { seconds, minutes, hours } = getDurationData(milliseconds)
-  return `${hours}:${minutes % 60}:${seconds % 60}`
+export const convertMsToCMITimespan = (milliseconds: number) => {
+  // CMITimespan "0000:00:00.00"
+  const { seconds, minutes, hours, cents } = getDurationData(milliseconds)
+  const h = pad(hours, 4)
+  const m = pad(minutes % 60, 2)
+  const s = pad(seconds % 60, 2)
+  const c = pad(cents % 100, 2)
+  return `${h}:${m}:${s}.${c}`
 }
 
 
@@ -424,4 +429,12 @@ const getDurationData = (milliseconds: number): {
   const hours = Math.floor(minutes / 60)
   const days = Math.floor(hours / 24)
   return { days, hours, minutes, seconds, cents }
+}
+
+const pad = (value: number, targetLength:number): string => {
+  const text = value.toString()
+  const padLength = targetLength - text.length;
+  if (padLength <= 0) return text;
+
+  return "0".repeat(padLength) + text;
 }
