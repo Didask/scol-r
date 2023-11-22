@@ -1,10 +1,6 @@
-export function MessageReceiver(
-  win: Window,
-  sourceOrigin: string,
-  adapter: any
-) {
+export function MessageReceiver(sourceOrigin: string, adapter: any) {
   this.timeoutId = null;
-  win.addEventListener(
+  window.top.addEventListener(
     "message",
     function (e: MessageEvent) {
       if (e.origin !== sourceOrigin) return;
@@ -67,11 +63,9 @@ export function MessageReceiver(
 }
 
 export class MessageEmitter {
-  private currentWindow: Window;
   private lmsOrigin: string;
 
   constructor(lmsOrigin: string) {
-    this.currentWindow = window.parent || window.opener;
     this.lmsOrigin = lmsOrigin;
   }
 
@@ -79,7 +73,7 @@ export class MessageEmitter {
     name: string,
     values: (string[] | string | number)[]
   ): void {
-    this.currentWindow.postMessage(
+    window.top.postMessage(
       {
         function: name,
         arguments: values,
