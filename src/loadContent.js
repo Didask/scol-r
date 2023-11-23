@@ -145,7 +145,7 @@ function loadContent() {
     host = host.slice(0, host.indexOf(":"));
   }
   var sourceOrigin = sourceUrlParser.protocol + "//" + host;
-  new MessageReceiver(sourceOrigin, ADAPTER);
+  new MessageReceiver(window, sourceOrigin, ADAPTER);
 
   var sessionStart = new Date().getTime();
 
