@@ -1,4 +1,4 @@
-function loadContent() {
+export function loadContent() {
   var messages = {
     en: {
       pageTitle: "Your content is loading...",
@@ -64,8 +64,10 @@ function loadContent() {
   var displayInitError = function (message) {
     var messagesContainer = document.getElementsByClassName("messages");
     var newMessage = document.createElement("p");
-    newMessage.innerHTML = localizeMessage(message);
+    var localizedMessage = localizeMessage(message);
+    newMessage.innerHTML = localizedMessage;
     messagesContainer.length && messagesContainer[0].appendChild(newMessage);
+    console.error(localizedMessage);
   };
 
   var displayRuntimeError = function () {
