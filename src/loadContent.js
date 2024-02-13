@@ -112,19 +112,19 @@ function loadContent() {
   sourceUrlParser.href = sourceUrl;
 
   var learnerId = ADAPTER.getLearnerId();
+  var learnerName = ADAPTER.getLearnerName();
   if (learnerId == null) {
     displayInitError("learnerIdMissing");
     return;
   }
 
   sourceUrlParser.search +=
-    (sourceUrlParser.search.indexOf("?") === -1 ? "?" : "&") +
-    "scorm&learner_id=" +
-    learnerId +
-    "&lms_origin=" +
-    encodeURIComponent(location.origin) +
-    "&data_from_lms=" +
-    ADAPTER.getDataFromLMS();
+    (sourceUrlParser.search.startsWith("?") ? "&" : "?") +
+    "scorm" +
+    `&learner_id=${learnerId}` +
+    `&learner_name=${learnerName}` +
+    `&lms_origin=${encodeURIComponent(location.origin)}` +
+    `&data_from_lms=${ADAPTER.getDataFromLMS()}`;
 
   var iframe = document.createElement("iframe");
   iframe.setAttribute("src", sourceUrlParser.href);
