@@ -38,7 +38,7 @@ export interface ManifestGeneratorProps {
   sharedResources?: string[];
   totalLearningTime?: number;
   dataFromLms?: string;
-  scormVersion?: typeof scormVersions[number];
+  scormVersion?: (typeof scormVersions)[number];
 }
 
 const removeSpecialChars = <T>(obj: T): T =>
