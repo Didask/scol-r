@@ -3,22 +3,25 @@ import { scormVersions } from ".";
 export class Sco {
   scoID: string;
   scoTitle: string;
+  scoHref: `./${string}`;
   author: string;
   learningTime: number;
   resources: string[];
 
-  constructor(
-    scoID: string,
-    scoTitle: string,
-    author: string,
-    learningTime: number,
-    resources?: string[]
-  ) {
-    this.scoID = scoID;
-    this.scoTitle = scoTitle;
-    this.author = author;
-    this.learningTime = learningTime;
-    this.resources = resources || [];
+  constructor(props: {
+    scoID: string;
+    scoTitle: string;
+    author: string;
+    learningTime: number;
+    scoHref: `./${string}`;
+    resources: string[];
+  }) {
+    this.scoID = props.scoID;
+    this.scoTitle = props.scoTitle;
+    this.author = props.author;
+    this.learningTime = props.learningTime;
+    this.resources = props.resources;
+    this.scoHref = props.scoHref;
   }
 }
 
@@ -157,9 +160,7 @@ export function ManifestGenerator({
         sharedResources?.length
           ? `<resource adlcp:scormtype="asset" type="webcontent" identifier="shared_resources">
             ${sharedResources
-              .map((resource) => {
-                return `<file href="${resource}"/>`;
-              })
+              .map((resource) => `<file href="${resource}"/>`)
               .join("\n")}
           </resource>`
           : ""
@@ -168,16 +169,14 @@ export function ManifestGenerator({
         .map((sco) => {
           return `<resource adlcp:scormtype="sco" type="webcontent" identifier="resource_${
             sco.scoID
-          }" href="./${sco.scoID}/index.html">
+          }" href="${sco.scoHref}">
             ${
               sharedResources?.length
                 ? '<dependency identifierref="shared_resources"/>'
                 : ""
             }
             ${sco.resources
-              .map((resource) => {
-                return `<file href="${resource}"/>`;
-              })
+              .map((resource) => `<file href="${resource}"/>`)
               .join("\n")}
           </resource>`;
         })
