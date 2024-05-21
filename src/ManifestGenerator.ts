@@ -76,6 +76,9 @@ export function ManifestGenerator({
         <imsmd:lom xmlns="http://ltsc.ieee.org/xsd/LOM">
           <imsmd:general>
             <imsmd:identifier>${courseId}</imsmd:identifier>
+            <imsmd:title>
+              <imsmd:langstring xml:lang="fr">${courseTitle}</imsmd:langstring>
+            </imsmd:title>
           </imsmd:general>
           <imsmd:lifecycle>
             <imsmd:contribute>
