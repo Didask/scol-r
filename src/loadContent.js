@@ -58,7 +58,7 @@ export function loadContent() {
   document.getElementById("footer-content").innerHTML =
     localizeMessage("pageFooter");
   document.getElementById("title-error-messages").innerHTML = localizeMessage(
-    "pageErrorMessagesTitle"
+    "pageErrorMessagesTitle",
   );
 
   var displayInitError = function (message) {
@@ -150,6 +150,15 @@ export function loadContent() {
   new MessageReceiver(window, sourceOrigin, ADAPTER);
 
   var sessionStart = new Date().getTime();
+
+  /*
+   * In case the beforeunload event is not triggered, we still want to send the session time to the LMS.
+   * This is why we send the session time every 10 seconds.
+   */
+  setInterval(() => {
+    var now = new Date().getTime();
+    ADAPTER.setSessionTime(now - sessionStart);
+  }, 10_000);
 
   window.addEventListener("beforeunload", function (e) {
     var sessionEnd = new Date().getTime();
