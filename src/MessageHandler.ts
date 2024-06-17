@@ -7,7 +7,7 @@ export function MessageReceiver(
   win.addEventListener(
     "message",
     function (e: MessageEvent) {
-      if (e.origin !== sourceOrigin) return;
+      if (e.origin !== sourceOrigin || e.origin === '*') return;
       const functionName = e.data["function"];
       const functionArgs = e.data["arguments"];
       if (
@@ -64,6 +64,10 @@ export function MessageReceiver(
       adapter.setObjectiveStatus(objectiveId, status);
     }
   };
+
+  this.LMSTerminate = function() {
+    adapter.LMSTerminate()
+  }
 }
 
 export class MessageEmitter {

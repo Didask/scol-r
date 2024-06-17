@@ -184,6 +184,7 @@ export class SCORMAdapter {
   }
 
   LMSTerminate() {
+    console.log('lms terminate called in wrapper');
     const functionName = this._isSCORM2004 ? "Terminate" : "Finish";
     const result = this._callAPIFunction(functionName);
     const success = eval(result.toString());
