@@ -166,13 +166,21 @@ export class SCORMAdapter {
     );
     this._errorCallback("apiNotFound");
   }
+  private validateResult(result: unknown) {
+    if (typeof result === "string") {
+      return result === "true";
+    } else if (typeof result === "boolean") {
+      return result;
+    }
+    return false;
+  }
 
   LMSInitialize() {
     const functionName = "Initialize";
     const result = this._callAPIFunction(functionName);
     const lastErrorCode = this.LMSGetLastError();
     const success =
-      eval(result.toString()) ||
+      this.validateResult(result) ||
       (this._isSCORM2004
         ? lastErrorCode === 103 // 103 in 2004.* = already initialized
         : lastErrorCode === 101); // 101 in 1.2 = already initialized
@@ -186,7 +194,7 @@ export class SCORMAdapter {
   LMSTerminate() {
     const functionName = this._isSCORM2004 ? "Terminate" : "Finish";
     const result = this._callAPIFunction(functionName);
-    const success = eval(result.toString());
+    const success = this.validateResult(result);
     return success || this._handleError(functionName);
   }
 
@@ -202,14 +210,24 @@ export class SCORMAdapter {
     this._lastRequest = { method: "set", key: name };
     const functionName = "SetValue";
     const result = this._callAPIFunction(functionName, [name, value]);
-    const success = eval(result.toString());
+    const success = this.validateResult(result);
     return success || this._handleError(`${functionName}: {${name}: ${value}}`);
   }
 
   LMSCommit() {
     const result = this._callAPIFunction("Commit");
-    const success = eval(result.toString());
-    return success || this._errorCallback("commitFailed");
+
+    if ("then" in result && typeof result.then === "function") {
+      result.then((success: unknown) => {
+        if (!this.validateResult(success)) {
+          this._errorCallback("commitFailed");
+        }
+      });
+      return true;
+    } else {
+      const success = this.validateResult(result);
+      return success || this._errorCallback("commitFailed");
+    }
   }
 
   LMSGetLastError() {
@@ -241,8 +259,8 @@ export class SCORMAdapter {
 
   getLearnerName() {
     const CMIVariableName = this._isSCORM2004
-     ? "cmi.learner_name"
-     : "cmi.core.student_name";
+      ? "cmi.learner_name"
+      : "cmi.core.student_name";
     return this.LMSGetValue(CMIVariableName);
   }
 
@@ -253,7 +271,7 @@ export class SCORMAdapter {
     } else {
       this.LMSSetValue("cmi.core.student_id", studentId);
       this.LMSSetValue("cmi.core.student_name", studentName);
-    } 
+    }
   }
 
   setScore(score: number) {
@@ -388,53 +406,54 @@ export class SCORMAdapter {
 }
 
 export const convertToTimeInterval = (milliseconds: number) => {
-// timeinterval (second,10,2),
-  const data = getDurationData(milliseconds)
-  const days = data.days
-  const hours = data.hours % 24
-  const minutes = data.minutes % 60
-  const seconds = data.seconds % 60
-  const cents  = data.cents % 100
+  // timeinterval (second,10,2),
+  const data = getDurationData(milliseconds);
+  const days = data.days;
+  const hours = data.hours % 24;
+  const minutes = data.minutes % 60;
+  const seconds = data.seconds % 60;
+  const cents = data.cents % 100;
 
-  const daysString = days ? days + 'D' : '';
-  const hoursString = hours ? hours + 'H' : '';
-  const minutesString = minutes ? minutes + 'M' : '';
-  const secondsString = seconds || '0' + (cents ? '.' + cents : '') + 'S';
+  const daysString = days ? days + "D" : "";
+  const hoursString = hours ? hours + "H" : "";
+  const minutesString = minutes ? minutes + "M" : "";
+  const secondsString = seconds || "0" + (cents ? "." + cents : "") + "S";
 
-  const hms = [ hoursString, minutesString, secondsString ].join('');
-  return 'P' + daysString + 'T' + hms;
-}
+  const hms = [hoursString, minutesString, secondsString].join("");
+  return "P" + daysString + "T" + hms;
+};
 
 export const convertMsToCMITimespan = (milliseconds: number) => {
   // CMITimespan "0000:00:00.00"
-  const { seconds, minutes, hours, cents } = getDurationData(milliseconds)
-  const h = pad(hours, 4)
-  const m = pad(minutes % 60, 2)
-  const s = pad(seconds % 60, 2)
-  const c = pad(cents % 100, 2)
-  return `${h}:${m}:${s}.${c}`
-}
+  const { seconds, minutes, hours, cents } = getDurationData(milliseconds);
+  const h = pad(hours, 4);
+  const m = pad(minutes % 60, 2);
+  const s = pad(seconds % 60, 2);
+  const c = pad(cents % 100, 2);
+  return `${h}:${m}:${s}.${c}`;
+};
 
-
-const getDurationData = (milliseconds: number): {
-  days: number
-  hours: number
-  minutes: number
-  seconds: number
-  cents: number
+const getDurationData = (
+  milliseconds: number
+): {
+  days: number;
+  hours: number;
+  minutes: number;
+  seconds: number;
+  cents: number;
 } => {
-  const cents = Math.floor(milliseconds / 10)
-  const seconds = Math.floor(milliseconds / 1000)
-  const minutes = Math.floor(seconds / 60)
-  const hours = Math.floor(minutes / 60)
-  const days = Math.floor(hours / 24)
-  return { days, hours, minutes, seconds, cents }
-}
+  const cents = Math.floor(milliseconds / 10);
+  const seconds = Math.floor(milliseconds / 1000);
+  const minutes = Math.floor(seconds / 60);
+  const hours = Math.floor(minutes / 60);
+  const days = Math.floor(hours / 24);
+  return { days, hours, minutes, seconds, cents };
+};
 
-const pad = (value: number, targetLength:number): string => {
-  const text = value.toString()
+const pad = (value: number, targetLength: number): string => {
+  const text = value.toString();
   const padLength = targetLength - text.length;
   if (padLength <= 0) return text;
 
   return "0".repeat(padLength) + text;
-}
+};
