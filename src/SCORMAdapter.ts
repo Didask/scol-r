@@ -217,17 +217,21 @@ export class SCORMAdapter {
   LMSCommit() {
     const result = this._callAPIFunction("Commit");
 
-    if ("then" in result && typeof result.then === "function") {
+    if (this.validateResult(result)) {
+      return true;
+    } else if (
+      typeof result === "object" &&
+      "then" in result &&
+      typeof result.then === "function"
+    ) {
       result.then((success: unknown) => {
         if (!this.validateResult(success)) {
           this._errorCallback("commitFailed");
         }
       });
       return true;
-    } else {
-      const success = this.validateResult(result);
-      return success || this._errorCallback("commitFailed");
     }
+    this._errorCallback("commitFailed");
   }
 
   LMSGetLastError() {
