@@ -421,7 +421,7 @@ export const convertToTimeInterval = (milliseconds: number) => {
   const daysString = days ? days + "D" : "";
   const hoursString = hours ? hours + "H" : "";
   const minutesString = minutes ? minutes + "M" : "";
-  const secondsString = seconds || "0" + (cents ? "." + cents : "") + "S";
+  const secondsString = (seconds || "0" + (cents ? "." + cents : "")) + "S";
 
   const hms = [hoursString, minutesString, secondsString].join("");
   return "P" + daysString + "T" + hms;
