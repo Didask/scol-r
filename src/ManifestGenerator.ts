@@ -50,7 +50,7 @@ const removeSpecialChars = <T>(obj: T): T =>
       ...acc,
       [key]: value.replace(/&/g, "-"),
     }),
-    {} as T
+    {} as T,
   );
 
 export function ManifestGenerator({
@@ -99,10 +99,31 @@ export function ManifestGenerator({
               </imsmd:centity>
             </imsmd:contribute>
           </imsmd:lifecycle>
+          <imsmd:metametadata>
+            <imsmd:metadatascheme>ADL SCORM 1.2</imsmd:metadatascheme>
+          </imsmd:metametadata>
+          <imsmd:rights>
+            <ismsmd:cost>
+              <ismsmd:source>
+                <ismsmd:langstring xml:lang="fr">LOMv1.0</ismsmd:langstring>
+              </ismsmd:source>
+              <ismsmd:value>
+                <ismsmd:langstring xml:lang="fr">yes</ismsmd:langstring>
+              </ismsmd:value>
+            </ismsmd:cost>
+            <ismsmd:copyrightandotherrestrictions>
+              <ismsmd:source>
+                <ismsmd:langstring xml:lang="fr">LOMv1.0</ismsmd:langstring>
+              </ismsmd:source>
+              <ismsmd:value>
+                <ismsmd:langstring xml:lang="fr">yes</ismsmd:langstring>
+              </ismsmd:value>
+            </ismsmd:copyrightandotherrestrictions>
+          </imsmd:rights>
           <imsmd:educational>
             <imsmd:typicallearningtime>
               <imsmd:datetime>${formatLearningTime(
-                courseGlobalLearningTime
+                courseGlobalLearningTime,
               )}</imsmd:datetime>
             </imsmd:typicallearningtime>
           </imsmd:educational>
@@ -147,7 +168,7 @@ export function ManifestGenerator({
                     <imsmd:educational>
                     <imsmd:typicallearningtime>
                       <imsmd:datetime>${formatLearningTime(
-                        learningTime
+                        learningTime,
                       )}</imsmd:datetime>
                     </imsmd:typicallearningtime>
                     </imsmd:educational>
