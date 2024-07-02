@@ -103,22 +103,22 @@ export function ManifestGenerator({
             <imsmd:metadatascheme>ADL SCORM 1.2</imsmd:metadatascheme>
           </imsmd:metametadata>
           <imsmd:rights>
-            <ismsmd:cost>
-              <ismsmd:source>
-                <ismsmd:langstring xml:lang="fr">LOMv1.0</ismsmd:langstring>
-              </ismsmd:source>
-              <ismsmd:value>
-                <ismsmd:langstring xml:lang="fr">yes</ismsmd:langstring>
-              </ismsmd:value>
-            </ismsmd:cost>
-            <ismsmd:copyrightandotherrestrictions>
-              <ismsmd:source>
-                <ismsmd:langstring xml:lang="fr">LOMv1.0</ismsmd:langstring>
-              </ismsmd:source>
-              <ismsmd:value>
-                <ismsmd:langstring xml:lang="fr">yes</ismsmd:langstring>
-              </ismsmd:value>
-            </ismsmd:copyrightandotherrestrictions>
+            <imsmd:cost>
+              <imsmd:source>
+                <imsmd:langstring xml:lang="fr">LOMv1.0</imsmd:langstring>
+              </imsmd:source>
+              <imsmd:value>
+                <imsmd:langstring xml:lang="fr">yes</imsmd:langstring>
+              </imsmd:value>
+            </imsmd:cost>
+            <imsmd:copyrightandotherrestrictions>
+              <imsmd:source>
+                <imsmd:langstring xml:lang="fr">LOMv1.0</imsmd:langstring>
+              </imsmd:source>
+              <imsmd:value>
+                <imsmd:langstring xml:lang="fr">yes</imsmd:langstring>
+              </imsmd:value>
+            </imsmd:copyrightandotherrestrictions>
           </imsmd:rights>
           <imsmd:educational>
             <imsmd:typicallearningtime>
