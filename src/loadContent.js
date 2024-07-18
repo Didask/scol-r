@@ -131,6 +131,7 @@ export function loadContent() {
   var iframe = document.createElement("iframe");
   iframe.setAttribute("src", sourceUrlParser.href);
   iframe.setAttribute("frameborder", "0");
+  iframe.setAttribute("allow", "camera *; microphone *");
   iframe.setAttribute("height", "100%");
   iframe.setAttribute("width", "100%");
   document.body.insertBefore(iframe, document.getElementById("wrapper"));
