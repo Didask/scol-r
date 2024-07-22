@@ -64,10 +64,6 @@ export function MessageReceiver(
       adapter.setObjectiveStatus(objectiveId, status);
     }
   };
-
-  this.LMSTerminate = function() {
-    adapter.LMSTerminate()
-  }
 }
 
 export class MessageEmitter {
