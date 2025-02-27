@@ -21,7 +21,7 @@ export class SCORMAdapter {
       code: 401,
       getShouldBeIgnored: () =>
         !this._isSCORM2004 &&
-        this._lastRequest &&
+        !!this._lastRequest &&
         this._lastRequest.method === "get" &&
         this._lastRequest.key === "cmi.objectives._children",
     },
@@ -29,20 +29,20 @@ export class SCORMAdapter {
       code: 402,
       getShouldBeIgnored: () =>
         this._isSCORM2004 &&
-        this._lastRequest &&
+        !!this._lastRequest &&
         this._lastRequest.method === "get" &&
         this._lastRequest.key === "cmi.objectives._children",
     },
     {
       code: 351,
       getShouldBeIgnored: () =>
-        this._lastRequest.method === "set" &&
+        this._lastRequest?.method === "set" &&
         new RegExp("^cmi.objectives.\\d+.id$").test(this._lastRequest.key) &&
         !!this.LMSGetValue(this._lastRequest.key),
     },
     {
       code: 113,
-      getShouldBeIgnored: () => this._lastRequest.key === "Terminate",
+      getShouldBeIgnored: () => this._lastRequest?.key === "Terminate",
     },
   ];
 
