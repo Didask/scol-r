@@ -7,7 +7,7 @@ export class SCORMAdapter {
   private _API: any;
   private _isSCORM2004: boolean;
   private _errorCallback: Function;
-  private _lastRequest: { method: "get" | "set"; key: string } | null;
+  private _lastRequest: { method?: "get" | "set"; key: string } | null;
   private _ignorableErrorCodes: {
     code: number;
     getShouldBeIgnored: () => boolean;
@@ -39,6 +39,10 @@ export class SCORMAdapter {
         this._lastRequest.method === "set" &&
         new RegExp("^cmi.objectives.\\d+.id$").test(this._lastRequest.key) &&
         !!this.LMSGetValue(this._lastRequest.key),
+    },
+    {
+      code: 113,
+      getShouldBeIgnored: () => this._lastRequest.key === "Terminate",
     },
   ];
 
@@ -192,6 +196,7 @@ export class SCORMAdapter {
   }
 
   LMSTerminate() {
+    this._lastRequest = { key: "Terminate" };
     const functionName = this._isSCORM2004 ? "Terminate" : "Finish";
     const result = this._callAPIFunction(functionName);
     const success = this.validateResult(result);
