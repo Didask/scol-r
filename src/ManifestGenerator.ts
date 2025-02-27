@@ -44,13 +44,13 @@ export interface ManifestGeneratorProps {
   scormVersion?: (typeof scormVersions)[number];
 }
 
-const removeSpecialChars = <T>(obj: T): T =>
+const removeSpecialChars = <T extends object>(obj: T): T =>
   Object.entries(obj).reduce(
     (acc, [key, value]) => ({
       ...acc,
       [key]: value.replace(/&/g, "-"),
     }),
-    {} as T,
+    {} as T
   );
 
 export function ManifestGenerator({
@@ -123,7 +123,7 @@ export function ManifestGenerator({
           <imsmd:educational>
             <imsmd:typicallearningtime>
               <imsmd:datetime>${formatLearningTime(
-                courseGlobalLearningTime,
+                courseGlobalLearningTime
               )}</imsmd:datetime>
             </imsmd:typicallearningtime>
           </imsmd:educational>
@@ -168,7 +168,7 @@ export function ManifestGenerator({
                     <imsmd:educational>
                     <imsmd:typicallearningtime>
                       <imsmd:datetime>${formatLearningTime(
-                        learningTime,
+                        learningTime
                       )}</imsmd:datetime>
                     </imsmd:typicallearningtime>
                     </imsmd:educational>
