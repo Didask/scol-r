@@ -58,7 +58,7 @@ export function loadContent() {
   document.getElementById("footer-content").innerHTML =
     localizeMessage("pageFooter");
   document.getElementById("title-error-messages").innerHTML = localizeMessage(
-    "pageErrorMessagesTitle",
+    "pageErrorMessagesTitle"
   );
 
   var displayInitError = function (message) {
@@ -125,8 +125,7 @@ export function loadContent() {
     "scorm" +
     `&learner_id=${learnerId}` +
     `&learner_name=${learnerName}` +
-    `&lms_origin=${encodeURIComponent(location.origin)}` +
-    `&data_from_lms=${ADAPTER.getDataFromLMS()}`;
+    `&lms_origin=${encodeURIComponent(location.origin)}`;
 
   var iframe = document.createElement("iframe");
   iframe.setAttribute("src", sourceUrlParser.href);
