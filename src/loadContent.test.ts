@@ -121,7 +121,7 @@ describe("loadContent", () => {
 
     const iframeSrc = iframe?.getAttribute("src");
     expect(iframeSrc).toBe(
-      "https://www.example.com/?scorm&learner_id=JohnDoeID&learner_name=John%20Doe&lms_origin=http%3A%2F%2Flocalhost&data_from_lms={%22lms_origin%22:%22http://localhost%22}"
+      "https://www.example.com/?scorm&learner_id=JohnDoeID&learner_name=John%20Doe&lms_origin=http%3A%2F%2Flocalhost"
     );
   });
 
@@ -139,7 +139,7 @@ describe("loadContent", () => {
 
     const iframeSrc = iframe?.getAttribute("src");
     expect(iframeSrc).toBe(
-      "https://www.example.com/?scorm&learner_id=JohnDoeID&learner_name=John%20Doe&lms_origin=http%3A%2F%2Flocalhost&data_from_lms={%22lms_origin%22:%22http://localhost%22}"
+      "https://www.example.com/?scorm&learner_id=JohnDoeID&learner_name=John%20Doe&lms_origin=http%3A%2F%2Flocalhost"
     );
   });
 });
