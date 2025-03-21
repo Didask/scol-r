@@ -1,4 +1,4 @@
-export function loadContent() {
+export async function loadContent({ hashIdentifiers = false } = {}) {
   var messages = {
     en: {
       pageTitle: "Your content is loading...",
@@ -120,12 +120,18 @@ export function loadContent() {
     return;
   }
 
+  if (hashIdentifiers) {
+    learnerId = await hashString(learnerId);
+    learnerName = await hashString(learnerName);
+  }
+
   sourceUrlParser.search +=
     (sourceUrlParser.search.startsWith("?") ? "&" : "?") +
     "scorm" +
     `&learner_id=${learnerId}` +
     `&learner_name=${learnerName}` +
-    `&lms_origin=${encodeURIComponent(location.origin)}`;
+    `&lms_origin=${encodeURIComponent(location.origin)}` +
+    `&are_identifiers_hashed=${hashIdentifiers}`;
 
   var iframe = document.createElement("iframe");
   iframe.setAttribute("src", sourceUrlParser.href);
