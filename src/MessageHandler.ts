@@ -2,7 +2,7 @@ export class MessageReceiver {
   constructor(
     win: Window,
     sourceOrigin: string,
-    private readonly adapter: any
+    private readonly adapter: any,
   ) {
     let timeoutId: NodeJS.Timeout | null = null;
 
@@ -27,7 +27,7 @@ export class MessageReceiver {
             timeoutId = null;
           }, 500);
         }
-      }.bind(this)
+      }.bind(this),
     );
   }
 
@@ -49,6 +49,7 @@ export class MessageReceiver {
 
   setLessonStatus(lessonStatus: string) {
     this.adapter.setLessonStatus(lessonStatus);
+    this.adapter.commit(); // We commit the changes to the LMS each time the lesson status is updated.
   }
 
   setObjectives(objectivesIds: string[]) {
@@ -81,14 +82,14 @@ export class MessageEmitter {
 
   private sendMessage(
     name: string,
-    values: (string[] | string | number)[]
+    values: (string[] | string | number)[],
   ): void {
     this.currentWindow.postMessage(
       {
         function: name,
         arguments: values,
       },
-      this.lmsOrigin
+      this.lmsOrigin,
     );
   }
 
@@ -109,7 +110,7 @@ export class MessageEmitter {
   }
   setObjectiveStatus(
     objectiveId: string,
-    status: "completed" | "incomplete"
+    status: "completed" | "incomplete",
   ): void {
     this.sendMessage("setObjectiveStatus", [objectiveId, status]);
   }
