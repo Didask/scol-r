@@ -138,6 +138,7 @@ export async function loadContent({ hashIdentifiers = false } = {}) {
   iframe.setAttribute("frameborder", "0");
   iframe.setAttribute("height", "100%");
   iframe.setAttribute("width", "100%");
+  iframe.setAttribute("allow", "microphone");
   document.body.insertBefore(iframe, document.getElementById("wrapper"));
 
   var sessionStart = new Date();
