@@ -14,7 +14,8 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "allowJs": true,
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "strict": true
   },
   "include": ["./src/*.ts", "./src/*.js"],
   "exclude": ["node_modules", "**/*.test.ts"]

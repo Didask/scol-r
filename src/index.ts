@@ -7,6 +7,7 @@ export const libFiles = [
   "loadContent.js",
   "MessageHandler.js",
   "SCORMAdapter.js",
+  "hashString.js",
 ] as const;
 
 export const scormVersions = [

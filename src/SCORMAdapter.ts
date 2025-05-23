@@ -7,7 +7,7 @@ export class SCORMAdapter {
   private _API: any;
   private _isSCORM2004: boolean;
   private _errorCallback: Function;
-  private _lastRequest: { method: "get" | "set"; key: string } | null;
+  private _lastRequest: { method?: "get" | "set"; key: string } | null;
   private _ignorableErrorCodes: {
     code: number;
     getShouldBeIgnored: () => boolean;
@@ -21,7 +21,7 @@ export class SCORMAdapter {
       code: 401,
       getShouldBeIgnored: () =>
         !this._isSCORM2004 &&
-        this._lastRequest &&
+        !!this._lastRequest &&
         this._lastRequest.method === "get" &&
         this._lastRequest.key === "cmi.objectives._children",
     },
@@ -29,16 +29,20 @@ export class SCORMAdapter {
       code: 402,
       getShouldBeIgnored: () =>
         this._isSCORM2004 &&
-        this._lastRequest &&
+        !!this._lastRequest &&
         this._lastRequest.method === "get" &&
         this._lastRequest.key === "cmi.objectives._children",
     },
     {
       code: 351,
       getShouldBeIgnored: () =>
-        this._lastRequest.method === "set" &&
+        this._lastRequest?.method === "set" &&
         new RegExp("^cmi.objectives.\\d+.id$").test(this._lastRequest.key) &&
         !!this.LMSGetValue(this._lastRequest.key),
+    },
+    {
+      code: 113,
+      getShouldBeIgnored: () => this._lastRequest?.key === "Terminate",
     },
   ];
 
@@ -132,8 +136,12 @@ export class SCORMAdapter {
     } else if (!this._isSCORM2004 && !(fun.indexOf("LMS") == 0)) {
       fun = "LMS" + fun;
     }
-    console.info("[SCOL-R] Calling a scorm api function", { fun, args });
-    return this._API[fun].apply(this._API, args);
+
+    const result = this._API[fun].apply(this._API, args);
+    console.info(
+      `[SCOL-R] ${fun}(${args.join(", ")}) = ${JSON.stringify(result)}`
+    );
+    return result;
   }
 
   private _handleError(functionName: string) {
@@ -192,6 +200,7 @@ export class SCORMAdapter {
   }
 
   LMSTerminate() {
+    this._lastRequest = { key: "Terminate" };
     const functionName = this._isSCORM2004 ? "Terminate" : "Finish";
     const result = this._callAPIFunction(functionName);
     const success = this.validateResult(result);

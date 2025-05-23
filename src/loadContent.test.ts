@@ -6,6 +6,7 @@ import { loadContent } from "./loadContent";
 import { HTMLGenerator } from "./HTMLGenerator";
 import { SCORMAdapter } from "./SCORMAdapter";
 import { MessageReceiver } from "./MessageHandler";
+import { createHash } from "crypto";
 
 const fakeAPI12Values = {
   "cmi.core.student_id": "JohnDoeID",
@@ -23,6 +24,7 @@ declare global {
   interface Window {
     SCORMAdapter: typeof SCORMAdapter;
     MessageReceiver: typeof MessageReceiver;
+    hashString: (str: string) => Promise<string>;
 
     // 1.2 API
     API?: {
@@ -76,8 +78,15 @@ function initializeAPI2004() {
   };
 }
 
+// This method is mocked because some methods are only available in the browser
+const mockHashString = jest.fn((str: string) => {
+  return Promise.resolve(createHash("SHA-256").update(str).digest("hex"));
+});
+
 window.SCORMAdapter = SCORMAdapter;
 window.MessageReceiver = MessageReceiver;
+window.hashString = mockHashString;
+
 const error = window.console.error;
 
 describe("loadContent", () => {
@@ -107,13 +116,13 @@ describe("loadContent", () => {
     ]);
   });
 
-  test("should call loadContent successfully with the 1.2 API", () => {
+  test("should call loadContent successfully with the 1.2 API", async () => {
     const mockError = jest.fn();
     window.console.error = mockError;
 
     initializeAPI12();
 
-    loadContent();
+    await loadContent();
     expect(mockError).not.toHaveBeenCalled();
 
     const iframe = document.querySelector("iframe");
@@ -121,17 +130,27 @@ describe("loadContent", () => {
 
     const iframeSrc = iframe?.getAttribute("src");
     expect(iframeSrc).toBe(
-      "https://www.example.com/?scorm&learner_id=JohnDoeID&learner_name=John%20Doe&lms_origin=http%3A%2F%2Flocalhost&data_from_lms={%22lms_origin%22:%22http://localhost%22}"
+      "https://www.example.com/?scorm&learner_id=JohnDoeID&learner_name=John%20Doe&lms_origin=http%3A%2F%2Flocalhost&are_identifiers_hashed=false"
     );
   });
 
-  test("should call loadContent successfully with the 2004 API", () => {
+  test("should call loadContent successfully with the 1.2 API and hashIdentifiers set to true", async () => {
+    initializeAPI12();
+    await loadContent({ hashIdentifiers: true });
+
+    const iframeSrc = document.querySelector("iframe")?.getAttribute("src");
+    expect(iframeSrc).toBe(
+      "https://www.example.com/?scorm&learner_id=f10110c925871dededae1bd23e33d012bfeba9c8bcbe08762628e8f94dbc5636&learner_name=6cea57c2fb6cbc2a40411135005760f241fffc3e5e67ab99882726431037f908&lms_origin=http%3A%2F%2Flocalhost&are_identifiers_hashed=true"
+    );
+  });
+
+  test("should call loadContent successfully with the 2004 API", async () => {
     const mockError = jest.fn();
     window.console.error = mockError;
 
     initializeAPI2004();
 
-    loadContent();
+    await loadContent({ hashIdentifiers: false });
     expect(mockError).not.toHaveBeenCalled();
 
     const iframe = document.querySelector("iframe");
@@ -139,7 +158,17 @@ describe("loadContent", () => {
 
     const iframeSrc = iframe?.getAttribute("src");
     expect(iframeSrc).toBe(
-      "https://www.example.com/?scorm&learner_id=JohnDoeID&learner_name=John%20Doe&lms_origin=http%3A%2F%2Flocalhost&data_from_lms={%22lms_origin%22:%22http://localhost%22}"
+      "https://www.example.com/?scorm&learner_id=JohnDoeID&learner_name=John%20Doe&lms_origin=http%3A%2F%2Flocalhost&are_identifiers_hashed=false"
+    );
+  });
+
+  test("should call loadContent successfully with the 2004 API and hashIdentifiers set to true", async () => {
+    initializeAPI2004();
+    await loadContent({ hashIdentifiers: true });
+
+    const iframeSrc = document.querySelector("iframe")?.getAttribute("src");
+    expect(iframeSrc).toBe(
+      "https://www.example.com/?scorm&learner_id=f10110c925871dededae1bd23e33d012bfeba9c8bcbe08762628e8f94dbc5636&learner_name=6cea57c2fb6cbc2a40411135005760f241fffc3e5e67ab99882726431037f908&lms_origin=http%3A%2F%2Flocalhost&are_identifiers_hashed=true"
     );
   });
 });

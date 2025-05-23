@@ -1,4 +1,4 @@
-export function loadContent() {
+export async function loadContent({ hashIdentifiers = false } = {}) {
   var messages = {
     en: {
       pageTitle: "Your content is loading...",
@@ -58,7 +58,7 @@ export function loadContent() {
   document.getElementById("footer-content").innerHTML =
     localizeMessage("pageFooter");
   document.getElementById("title-error-messages").innerHTML = localizeMessage(
-    "pageErrorMessagesTitle",
+    "pageErrorMessagesTitle"
   );
 
   var displayInitError = function (message) {
@@ -120,19 +120,25 @@ export function loadContent() {
     return;
   }
 
+  if (hashIdentifiers) {
+    learnerId = await hashString(learnerId);
+    learnerName = await hashString(learnerName);
+  }
+
   sourceUrlParser.search +=
     (sourceUrlParser.search.startsWith("?") ? "&" : "?") +
     "scorm" +
     `&learner_id=${learnerId}` +
     `&learner_name=${learnerName}` +
     `&lms_origin=${encodeURIComponent(location.origin)}` +
-    `&data_from_lms=${ADAPTER.getDataFromLMS()}`;
+    `&are_identifiers_hashed=${hashIdentifiers}`;
 
   var iframe = document.createElement("iframe");
   iframe.setAttribute("src", sourceUrlParser.href);
   iframe.setAttribute("frameborder", "0");
   iframe.setAttribute("height", "100%");
   iframe.setAttribute("width", "100%");
+  iframe.setAttribute("allow", "microphone");
   document.body.insertBefore(iframe, document.getElementById("wrapper"));
 
   var sessionStart = new Date();
