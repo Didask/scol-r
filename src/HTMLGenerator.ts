@@ -1,16 +1,18 @@
 export interface HTMLGeneratorProps {
   dataSource: string;
   libPath?: string;
+  hashIdentifiers?: boolean;
 }
 
 export function HTMLGenerator(props: HTMLGeneratorProps) {
-  const { dataSource, libPath = "lib" } = props;
+  const { dataSource, libPath = "lib", hashIdentifiers = false } = props;
   return `<!DOCTYPE html>
     <html>
         <head>
             <title>SCO local endpoint</title>
             <meta charset="UTF-8"/>
             <script>var exports = {};</script>
+            <script type="text/javascript" src="${libPath}/hashString.js"></script>
             <script type="text/javascript" src="${libPath}/SCORMAdapter.js"></script>
             <script type="text/javascript" src="${libPath}/MessageHandler.js"></script>
             <script type="text/javascript" src="${libPath}/loadContent.js"></script>
@@ -50,7 +52,7 @@ export function HTMLGenerator(props: HTMLGeneratorProps) {
             </style>
         </head>
         <!-- Set the body's data-source attribute to the SCO's remote endpoint. -->
-        <body onload="loadContent();" data-source="${dataSource}">
+        <body onload="loadContent({hashIdentifiers: ${hashIdentifiers}});" data-source="${dataSource}">
             <div id="wrapper">
                 <div class="header"><div class="container">
                     <h1 id="title">Your content is loading...</h1>

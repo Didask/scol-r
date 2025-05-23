@@ -1,10 +1,12 @@
 {
   "name": "@didask/scol-r",
-  "version": "2.6.4",
+  "version": "2.12.0",
   "description": "Shareable Cross-Origin Learning Resources",
   "main": "index.html",
   "types": "lib/index.d.ts",
-  "files": ["lib/"],
+  "files": [
+    "lib/"
+  ],
   "scripts": {
     "build": "tsc",
     "clean": "rm -rf node_modules lib",
@@ -14,7 +16,10 @@
     "type": "git",
     "url": "git+https://github.com/Didask/scol-r.git"
   },
-  "keywords": ["SCORM", "CORS"],
+  "keywords": [
+    "SCORM",
+    "CORS"
+  ],
   "author": "Didask",
   "license": "ISC",
   "bugs": {
