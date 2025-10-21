@@ -18,7 +18,7 @@ export async function loadContent({ hashIdentifiers = false } = {}) {
         "<p>We could find the address of the remote resource: it looks like this module is invalid, please contact your LMS administrator.</p>",
       runtimeErrorTitle: "An error occurred:",
       commitFailed:
-        "The intermediate recording could not succeed. Please close the window and try again later, or contact your administrator if the problem keeps occurring.",
+        "Your progress is being saved. If you see this message repeatedly, you may want to contact your administrator.",
     },
     fr: {
       pageTitle: "Votre contenu est en cours de chargement...",
@@ -38,7 +38,7 @@ export async function loadContent({ hashIdentifiers = false } = {}) {
         "<p>Nous n'avons pas pu trouver l'adresse de la ressource distante&nbsp;: il semble que ce module est invalide, veuillez contacter l'administrateur de votre LMS.</p>",
       runtimeErrorTitle: "Une erreur s'est produite&nbsp;:",
       commitFailed:
-        "La sauvegarde automatique intermédiaire n’a pu aboutir. Si cette erreur se produit fréquemment veuillez fermer votre contenu et retenter plus tard ou contacter votre administrateur.",
+        "Votre progression est en cours de sauvegarde. Si ce message apparaît de manière répétée, vous pouvez contacter votre administrateur.",
     },
   };
 
@@ -58,7 +58,7 @@ export async function loadContent({ hashIdentifiers = false } = {}) {
   document.getElementById("footer-content").innerHTML =
     localizeMessage("pageFooter");
   document.getElementById("title-error-messages").innerHTML = localizeMessage(
-    "pageErrorMessagesTitle"
+    "pageErrorMessagesTitle",
   );
 
   var displayInitError = function (message) {
