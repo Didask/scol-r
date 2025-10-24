@@ -43,7 +43,7 @@ export function HTMLGenerator(props: HTMLGeneratorProps) {
                 #runtime-error {
                     position: fixed;
                     left: 20px; bottom: 20px; padding: 15px;
-                    background-color: #f44a3d; color: white;
+                    background-color: #fcf9f7; color: #393837;
                     font-size: 16px;
                 }
                 #runtime-error h6, #runtime-error p { margin: 0 0 10px;}
