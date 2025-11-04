@@ -49,7 +49,6 @@ export class MessageReceiver {
 
   setLessonStatus(lessonStatus: string) {
     this.adapter.setLessonStatus(lessonStatus);
-    this.adapter.LMSCommit(); // We commit the changes to the LMS each time the lesson status is updated.
   }
 
   setObjectives(objectivesIds: string[]) {
