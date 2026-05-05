@@ -130,8 +130,17 @@ describe("loadContent", () => {
 
     const iframeSrc = iframe?.getAttribute("src");
     expect(iframeSrc).toBe(
-      "https://www.example.com/?scorm&learner_id=JohnDoeID&learner_name=John%20Doe&lms_origin=http%3A%2F%2Flocalhost&are_identifiers_hashed=false"
+      "https://www.example.com/?scorm&learner_id=JohnDoeID&learner_name=John%20Doe&lms_origin=http%3A%2F%2Flocalhost&are_identifiers_hashed=false",
     );
+  });
+
+  test("should grant fullscreen permission to embedded content", async () => {
+    initializeAPI12();
+    await loadContent();
+
+    const iframe = document.querySelector("iframe");
+    expect(iframe?.getAttribute("allow")).toBe("microphone; fullscreen");
+    expect(iframe?.hasAttribute("allowfullscreen")).toBe(true);
   });
 
   test("should call loadContent successfully with the 1.2 API and hashIdentifiers set to true", async () => {
@@ -140,7 +149,7 @@ describe("loadContent", () => {
 
     const iframeSrc = document.querySelector("iframe")?.getAttribute("src");
     expect(iframeSrc).toBe(
-      "https://www.example.com/?scorm&learner_id=f10110c925871dededae1bd23e33d012bfeba9c8bcbe08762628e8f94dbc5636&learner_name=6cea57c2fb6cbc2a40411135005760f241fffc3e5e67ab99882726431037f908&lms_origin=http%3A%2F%2Flocalhost&are_identifiers_hashed=true"
+      "https://www.example.com/?scorm&learner_id=f10110c925871dededae1bd23e33d012bfeba9c8bcbe08762628e8f94dbc5636&learner_name=6cea57c2fb6cbc2a40411135005760f241fffc3e5e67ab99882726431037f908&lms_origin=http%3A%2F%2Flocalhost&are_identifiers_hashed=true",
     );
   });
 
@@ -158,7 +167,7 @@ describe("loadContent", () => {
 
     const iframeSrc = iframe?.getAttribute("src");
     expect(iframeSrc).toBe(
-      "https://www.example.com/?scorm&learner_id=JohnDoeID&learner_name=John%20Doe&lms_origin=http%3A%2F%2Flocalhost&are_identifiers_hashed=false"
+      "https://www.example.com/?scorm&learner_id=JohnDoeID&learner_name=John%20Doe&lms_origin=http%3A%2F%2Flocalhost&are_identifiers_hashed=false",
     );
   });
 
@@ -168,7 +177,7 @@ describe("loadContent", () => {
 
     const iframeSrc = document.querySelector("iframe")?.getAttribute("src");
     expect(iframeSrc).toBe(
-      "https://www.example.com/?scorm&learner_id=f10110c925871dededae1bd23e33d012bfeba9c8bcbe08762628e8f94dbc5636&learner_name=6cea57c2fb6cbc2a40411135005760f241fffc3e5e67ab99882726431037f908&lms_origin=http%3A%2F%2Flocalhost&are_identifiers_hashed=true"
+      "https://www.example.com/?scorm&learner_id=f10110c925871dededae1bd23e33d012bfeba9c8bcbe08762628e8f94dbc5636&learner_name=6cea57c2fb6cbc2a40411135005760f241fffc3e5e67ab99882726431037f908&lms_origin=http%3A%2F%2Flocalhost&are_identifiers_hashed=true",
     );
   });
 });
