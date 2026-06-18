@@ -93,11 +93,19 @@ export class SCORMAdapter {
     }
   }
 
+  private _isValid12API(api: any): boolean {
+    return !!api && typeof api.LMSInitialize === "function";
+  }
+
+  private _isValid2004API(api: any): boolean {
+    return !!api && typeof api.Initialize === "function";
+  }
+
   private _findAPIInWindow(win: ApiWindow) {
     let findAPITries = 0;
     while (
-      win.API == null &&
-      win.API_1484_11 == null &&
+      !this._isValid12API(win.API) &&
+      !this._isValid2004API(win.API_1484_11) &&
       win.parent != null &&
       win.parent != win
     ) {
@@ -109,12 +117,12 @@ export class SCORMAdapter {
       win = win.parent as ApiWindow;
     }
 
-    if (win.API) {
+    if (this._isValid12API(win.API)) {
       return {
         API: win.API,
         isSCORM2004: false,
       };
-    } else if (win.API_1484_11) {
+    } else if (this._isValid2004API(win.API_1484_11)) {
       return {
         API: win.API_1484_11,
         isSCORM2004: true,
@@ -135,6 +143,17 @@ export class SCORMAdapter {
       fun = fun.substr(3);
     } else if (!this._isSCORM2004 && !(fun.indexOf("LMS") == 0)) {
       fun = "LMS" + fun;
+    }
+
+    if (typeof this._API[fun] !== "function") {
+      console.error(
+        `[SCOL-R] The SCORM API does not expose "${fun}". ` +
+          `The adapter selected ${
+            this._isSCORM2004 ? "a SCORM 2004" : "a SCORM 1.2"
+          } API that is missing this function.`
+      );
+      this._errorCallback("apiFunctionMissing");
+      return;
     }
 
     const result = this._API[fun].apply(this._API, args);
