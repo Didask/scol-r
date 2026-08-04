@@ -315,6 +315,13 @@ export class SCORMAdapter {
     }
   }
 
+  setProgress(measure: number) {
+    // cmi.progress_measure is a SCORM 2004 field (real 0..1); SCORM 1.2 has no equivalent.
+    if (!this._isSCORM2004) return;
+    const clamped = Math.min(1, Math.max(0, measure));
+    this.LMSSetValue("cmi.progress_measure", clamped);
+  }
+
   getScore() {
     const CMIVariableName = this._isSCORM2004
       ? "cmi.score.raw"
