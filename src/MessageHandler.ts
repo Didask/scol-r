@@ -43,6 +43,10 @@ export class MessageReceiver {
     this.adapter.setScore(score);
   }
 
+  setProgress(measure: number) {
+    this.adapter.setProgress(measure);
+  }
+
   setStudent(studentId: string, studentName: string) {
     this.adapter.setStudent(studentId, studentName);
   }
@@ -100,6 +104,9 @@ export class MessageEmitter {
   }
   setScore(score: number): void {
     this.sendMessage("setScore", [score]);
+  }
+  setProgress(measure: number): void {
+    this.sendMessage("setProgress", [measure]);
   }
   setObjectives(objectives: string[]): void {
     this.sendMessage("setObjectives", [objectives]);
