@@ -43,9 +43,9 @@ declare global {
       Initialize: () => boolean;
       Terminate: VoidFunction;
       GetValue: (key: string) => string;
-      SetValue: () => boolean;
+      SetValue: (key: string, value: unknown) => boolean;
       Commit: VoidFunction;
-      GetLastError: () => number;
+      GetLastError: () => number | string;
       GetErrorString: VoidFunction;
       GetDiagnostic: VoidFunction;
     };
@@ -180,4 +180,36 @@ describe("loadContent", () => {
       "https://www.example.com/?scorm&learner_id=f10110c925871dededae1bd23e33d012bfeba9c8bcbe08762628e8f94dbc5636&learner_name=6cea57c2fb6cbc2a40411135005760f241fffc3e5e67ab99882726431037f908&lms_origin=http%3A%2F%2Flocalhost&are_identifiers_hashed=true",
     );
   });
+});
+
+test("launches a learner who has not started when the LMS keeps reporting a rejected status write", async () => {
+  document.documentElement.innerHTML = HTMLGenerator({
+    dataSource: "https://www.example.com",
+  });
+  delete window.API;
+  let lastError = "0";
+  window.API_1484_11 = {
+    Initialize: jest.fn(() => true),
+    Terminate: jest.fn(),
+    GetValue: jest.fn((key) =>
+      key === "cmi.completion_status"
+        ? "not attempted"
+        : fakeAPI2004Values[key] || "",
+    ),
+    SetValue: jest.fn((key) => {
+      if (key !== "cmi.success_status") return true;
+      lastError = "405";
+      return false;
+    }),
+    Commit: jest.fn(),
+    GetLastError: jest.fn(() => lastError),
+    GetErrorString: jest.fn(),
+    GetDiagnostic: jest.fn(),
+  };
+
+  await loadContent();
+
+  expect(document.querySelector("iframe")?.getAttribute("src")).toBe(
+    "https://www.example.com/?scorm&learner_id=JohnDoeID&learner_name=John%20Doe&lms_origin=http%3A%2F%2Flocalhost&are_identifiers_hashed=false",
+  );
 });

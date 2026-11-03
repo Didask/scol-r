@@ -99,6 +99,14 @@ export async function loadContent({ hashIdentifiers = false } = {}) {
     displayInitError("couldNotInitialize");
     return;
   }
+
+  var learnerId = ADAPTER.getLearnerId();
+  var learnerName = ADAPTER.getLearnerName();
+  if (learnerId == null) {
+    displayInitError("learnerIdMissing");
+    return;
+  }
+
   var lessonStatus = ADAPTER.getLessonStatus();
   if (lessonStatus === "not attempted") {
     ADAPTER.setLessonStatus("incomplete");
@@ -112,13 +120,6 @@ export async function loadContent({ hashIdentifiers = false } = {}) {
 
   var sourceUrlParser = document.createElement("a");
   sourceUrlParser.href = sourceUrl;
-
-  var learnerId = ADAPTER.getLearnerId();
-  var learnerName = ADAPTER.getLearnerName();
-  if (learnerId == null) {
-    displayInitError("learnerIdMissing");
-    return;
-  }
 
   if (hashIdentifiers) {
     learnerId = await hashString(learnerId);
